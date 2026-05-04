@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: new-school-project
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 3500
+      - key: MONGO_URI
+        sync: false
+        # Note: You MUST configure MONGO_URI in the Render Dashboard -> Environment Variables
