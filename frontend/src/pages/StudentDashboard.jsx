@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { BookOpen, AlertCircle, PlayCircle, CheckCircle, Trophy, Star, User, Calendar } from 'lucide-react';
+import { BookOpen, AlertCircle, PlayCircle, CheckCircle, Trophy, Star, User, Calendar, CreditCard } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const StudentDashboard = () => {
@@ -15,6 +15,7 @@ const StudentDashboard = () => {
     const [mySubmissions, setMySubmissions] = useState([]);
     const [showSubmitModal, setShowSubmitModal] = useState(null);
     const [submissionUrl, setSubmissionUrl] = useState('');
+    const [myFees, setMyFees] = useState([]);
 
     // Test Taking State
     const [activeExam, setActiveExam] = useState(null);
@@ -45,10 +46,11 @@ const StudentDashboard = () => {
 
     const fetchDashboardData = async () => {
         try {
-            const [statsRes, examsRes, schedulesRes] = await Promise.all([
+            const [statsRes, examsRes, schedulesRes, feesRes] = await Promise.all([
                 axios.get('/DashBoard/student-stats'),
                 axios.get('/Exam/available').catch(() => ({ data: { data: { exams: [] } } })),
-                axios.get('/ExamSchedule').catch(() => ({ data: { data: { schedules: [] } } }))
+                axios.get('/ExamSchedule').catch(() => ({ data: { data: { schedules: [] } } })),
+                axios.get('/Fees/my-fees').catch(() => ({ data: { data: { fees: [] } } }))
             ]);
 
             const { enrolledClasses, recentGrades, points: userPoints } = statsRes.data.data;
@@ -58,6 +60,7 @@ const StudentDashboard = () => {
             setGrades(recentGrades);
             setAvailableExams(examsRes.data.data.exams || []);
             setExamSchedules(schedulesRes.data.data.schedules || []);
+            setMyFees(feesRes.data.data?.fees || []);
 
             // Fetch assignments for student's classes
             const allAssignments = [];
@@ -446,6 +449,58 @@ const StudentDashboard = () => {
                             </table>
                         </div>
                     )}
+                </div>
+
+                {/* My Fees & Payments */}
+                <div className="glass-card" style={{ gridColumn: 'span 2' }}>
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', color: 'var(--accent-neon)' }}>
+                        <CreditCard size={20} /> My Fees & Payments
+                    </h3>
+                    <div className="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Term</th>
+                                    <th>Amount</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Payment Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {myFees.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="6" className="text-center text-muted" style={{ padding: '1rem' }}>
+                                            No fees assigned for this term.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    myFees.map(fee => (
+                                        <tr key={fee._id} style={{ borderLeft: fee.status === 'Unpaid' ? '3px solid var(--danger)' : 'none' }}>
+                                            <td className="font-bold">{fee.description}</td>
+                                            <td>{fee.term}</td>
+                                            <td className="font-bold text-white">${fee.amount}</td>
+                                            <td style={{ color: fee.status === 'Unpaid' && new Date(fee.dueDate) < new Date() ? 'var(--danger)' : 'inherit' }}>
+                                                {new Date(fee.dueDate).toLocaleDateString()}
+                                                {fee.status === 'Unpaid' && new Date(fee.dueDate) < new Date() && (
+                                                    <span style={{ fontSize: '10px', color: 'var(--danger)', marginLeft: '8px', fontWeight: 'bold' }}>(OVERDUE)</span>
+                                                )}
+                                            </td>
+                                            <td>
+                                                {fee.status === 'Paid' ? (
+                                                    <span className="badge badge-success px-3 py-1 shadow-[0_0_10px_rgba(0,255,136,0.2)]">Paid</span>
+                                                ) : (
+                                                    <span className="badge px-3 py-1 shadow-[0_0_10px_rgba(239,68,68,0.2)]" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '20px', fontSize: '11px' }}>Unpaid</span>
+                                                )}
+                                            </td>
+                                            <td>{fee.paidDate ? new Date(fee.paidDate).toLocaleDateString() : '-'}</td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

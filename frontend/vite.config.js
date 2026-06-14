@@ -42,6 +42,14 @@ export default defineConfig({
         target: 'http://localhost:3000',
         rewrite: (path) => path.replace(/^\/Assignments/, '/api/assignments')
       },
+      '/Fees': {
+        target: 'http://localhost:3000',
+        rewrite: (path) => path.replace(/^\/Fees/, '/api/fees')
+      },
+      '/Salaries': {
+        target: 'http://localhost:3000',
+        rewrite: (path) => path.replace(/^\/Salaries/, '/api/salaries')
+      },
       '/socket.io': {
         target: 'ws://localhost:3000',
         ws: true

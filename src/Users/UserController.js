@@ -177,25 +177,31 @@ export const deleteUser = catchasync(async (req, res, next) => {
     if (!user) return next(new AppError('User not found', 404));
     res.status(204).json({ status: 'success', data: null });
 });
-export const DectivateUsers = catchasync(async (req, res) => {
+export const DectivateUsers = catchasync(async (req, res, next) => {
     try {
-        const { userId } = req.params;
+        const userId = req.params.id;
 
         const UpdateUser = await User.findByIdAndUpdate(userId, { $set: { isApproved: false } }, { new: true });
         if (!UpdateUser) {
             return next(new AppError('User not found', 404));
         }
-        res.status(200).json({ status: 'success', data: { user: UpdateUser } });
 
         const io = req.app.get('socketio');
-        io.to(userId).emit('user_deactivated', {
-            message: 'Your account has been deactivated by the manager.'
-        })
-        console.log('Force fully Logged out', userId);
-        res.status(200).json({ status: 'success', message: 'User deactivated successfully' });
+        if (io) {
+            io.to(userId).emit('user_deactivated', {
+                message: 'Your account has been deactivated by the manager.'
+            });
+            console.log('Force fully Logged out', userId);
+        }
+        res.status(200).json({
+            status: 'success',
+            message: 'User deactivated successfully',
+            data: { user: UpdateUser }
+        });
     }
     catch (error) {
         console.log('Error Deactivating User', error);
         res.status(500).json({ status: 'error', message: 'Failed to deactivate user' });
     }
 });
+

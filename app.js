@@ -13,6 +13,8 @@ import lecturesRoute from './src/Lectures/LecturesRoute.js';
 import NotificationRoute from './src/Notifications/NotificationRoute.js';
 import aiRoute from './src/Ai/AiRoute.js';
 import assignmentRoute from './src/Assignments/AssignmentRoute.js';
+import feesRoute from './src/Fees/FeesRoute.js';
+import salaryRoute from './src/Salaries/SalaryRoute.js';
 
 // Import Error Controller
 import globalErrorController from './src/Errors/errorController.js';
@@ -37,6 +39,8 @@ app.use('/api/lectures', lecturesRoute);
 app.use('/api/notifications', NotificationRoute);
 app.use('/api/ai', aiRoute);
 app.use('/api/assignments', assignmentRoute);
+app.use('/api/fees', feesRoute);
+app.use('/api/salaries', salaryRoute);
 
 // Health Check Route
 app.get('/health', (req, res) => {

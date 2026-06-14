@@ -13,7 +13,11 @@ import {
   ShieldCheck,
   LayoutDashboard,
   Calendar,
-  Clock
+  Clock,
+  UserMinus,
+  UserCheck,
+  CreditCard,
+  DollarSign
 } from 'lucide-react';
 
 const LEVELS = [1, 2, 3, 4];
@@ -361,6 +365,168 @@ const BulkImportWidget = ({ onImportSuccess }) => {
   );
 };
 
+const shimmerStyle = {
+  background: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)',
+  backgroundSize: '800px 100%',
+  animation: 'shimmer 1.4s infinite linear',
+  borderRadius: '8px',
+};
+
+const skeletonBar = (width, height) => ({
+  ...shimmerStyle,
+  width,
+  height: `${height}px`,
+  borderRadius: '6px',
+});
+
+const skeletonCircle = (size) => ({
+  ...shimmerStyle,
+  width: `${size}px`,
+  height: `${size}px`,
+  borderRadius: '50%',
+  flexShrink: 0,
+});
+
+const ManagerSkeleton = () => {
+  useEffect(() => {
+    // Inject shimmer keyframes if not already injected
+    if (!document.getElementById('manager-shimmer-styles')) {
+      const styleEl = document.createElement('style');
+      styleEl.id = 'manager-shimmer-styles';
+      styleEl.textContent = `
+        @keyframes shimmer {
+          0% { background-position: -400px 0; }
+          100% { background-position: 400px 0; }
+        }
+      `;
+      document.head.appendChild(styleEl);
+    }
+  }, []);
+
+  return (
+    <div className="animate-fade-in p-6">
+      {/* Tab Nav Skeleton */}
+      <nav className="tab-nav">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div
+            key={i}
+            className="tab-btn"
+            style={{
+              border: '1px solid rgba(255, 255, 255, 0.05)',
+              background: 'rgba(255, 255, 255, 0.02)',
+              cursor: 'default',
+              pointerEvents: 'none',
+              width: '130px',
+              height: '42px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <div style={skeletonCircle(18)} />
+            <div style={skeletonBar('60%', 12)} />
+          </div>
+        ))}
+      </nav>
+
+      {/* Overview Cards Skeleton */}
+      <div className="dashboard-grid">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="glass-card relative overflow-hidden"
+            style={{ aspectRatio: '1.5 / 1', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '2rem' }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+              <div style={{ ...skeletonCircle(40), borderRadius: '12px' }} />
+            </div>
+            <div>
+              <div style={{ ...skeletonBar('40%', 10), marginBottom: '8px' }} />
+              <div style={skeletonBar('60%', 24)} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Grid below cards */}
+      <div className="dashboard-grid mt-10">
+        {/* Table Skeleton */}
+        <div className="glass-card" style={{ gridColumn: 'span 2', padding: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.5rem' }}>
+            <div style={{ ...skeletonCircle(36), borderRadius: '8px' }} />
+            <div style={skeletonBar('40%', 18)} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {[1, 2, 3, 4, 5].map((row) => (
+              <div
+                key={row}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '16px',
+                  padding: '12px',
+                  background: 'rgba(255,255,255,0.01)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(255,255,255,0.02)',
+                }}
+              >
+                <div style={skeletonCircle(32)} />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={skeletonBar('35%', 12)} />
+                  <div style={skeletonBar('20%', 8)} />
+                </div>
+                <div style={skeletonBar('15%', 18)} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Academic Levels Summary Skeleton */}
+        <div className="glass-card" style={{ gridColumn: 'span 2', padding: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.5rem' }}>
+            <div style={{ ...skeletonCircle(24), borderRadius: '4px' }} />
+            <div style={skeletonBar('50%', 18)} />
+          </div>
+          <div style={{ display: 'flex', gap: '1.25rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+            {[1, 2, 3, 4].map((level) => (
+              <div
+                key={level}
+                className="glass-card"
+                style={{
+                  flexShrink: 0,
+                  width: '180px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  padding: '1.5rem 1rem',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                  cursor: 'default',
+                }}
+              >
+                <div style={{ ...skeletonCircle(42), marginBottom: '8px' }} />
+                <div style={{ ...skeletonBar('50%', 12), marginBottom: '16px' }} />
+                <div style={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.06)', marginBottom: '16px' }} />
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <div style={skeletonBar('40%', 10)} />
+                  <div style={skeletonBar('20%', 10)} />
+                </div>
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <div style={skeletonBar('45%', 10)} />
+                  <div style={skeletonBar('15%', 10)} />
+                </div>
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={skeletonBar('35%', 10)} />
+                  <div style={skeletonBar('25%', 10)} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ManagerDashboard = () => {
   const [stats, setStats] = useState({
     classes: [],
@@ -397,6 +563,22 @@ const ManagerDashboard = () => {
   // Emergency Alert state
   const [emergencyMsg, setEmergencyMsg] = useState('');
   const [isBroadcasting, setIsBroadcasting] = useState(false);
+
+  // Fees State
+  const [feesList, setFeesList] = useState([]);
+  const [isAssigningFee, setIsAssigningFee] = useState(false);
+  const [feeForm, setFeeForm] = useState({ studentId: '', amount: '', term: 'Term 1', dueDate: '', description: 'Tuition Fee' });
+  const [feeSearchQuery, setFeeSearchQuery] = useState('');
+  const [feeFilterStatus, setFeeFilterStatus] = useState('All');
+
+  // Salaries State
+  const [salariesList, setSalariesList] = useState([]);
+  const [isAssigningSalary, setIsAssigningSalary] = useState(false);
+  const [salaryForm, setSalaryForm] = useState({ teacherId: '', amount: '', term: 'Term 1', dueDate: '', description: 'Monthly Base Salary' });
+  const [salarySearchQuery, setSalarySearchQuery] = useState('');
+  const [salaryFilterStatus, setSalaryFilterStatus] = useState('All');
+  const [financeSubTab, setFinanceSubTab] = useState('fees'); // 'fees' or 'salaries'
+
   const classesByLevel = useMemo(() => {
     return LEVELS.reduce((acc, level) => {
       acc[level] = stats.classes.filter((c) => c.level === level);
@@ -407,14 +589,18 @@ const ManagerDashboard = () => {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const [statsRes, pendingRes, schedulesRes] = await Promise.all([
+      const [statsRes, pendingRes, schedulesRes, feesRes, salariesRes] = await Promise.all([
         axios.get('/DashBoard/manager-stats', { headers: { Authorization: `Bearer ${token}` } }),
         axios.get('/User/pending-users', { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: { data: { users: [] } } })),
-        axios.get('/ExamSchedule', { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: { data: { schedules: [] } } }))
+        axios.get('/ExamSchedule', { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: { data: { schedules: [] } } })),
+        axios.get('/Fees', { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: { data: { fees: [] } } })),
+        axios.get('/Salaries', { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: { data: { salaries: [] } } }))
       ]);
       setStats(statsRes.data.data);
       setPendingUsers(pendingRes.data.data.users);
       setSchedules(schedulesRes.data.data.schedules || []);
+      setFeesList(feesRes.data.data?.fees || []);
+      setSalariesList(salariesRes.data.data?.salaries || []);
       setLoading(false);
     } catch (err) {
       console.error(err);
@@ -431,14 +617,109 @@ const ManagerDashboard = () => {
     try {
       await axios.patch(`/User/approve-user/${userId}`, { isApproved: true });
       alert("User approved successfully!");
-      // Refresh data
-      const pendingRes = await axios.get('/User/pending-users');
-      setPendingUsers(pendingRes.data.data.users);
-      // Also refresh stats to show in directory
-      const statsRes = await axios.get('/DashBoard/manager-stats');
-      setStats(statsRes.data.data);
+      fetchData();
     } catch (err) {
       alert(err.response?.data?.message || "Failed to approve user");
+    }
+  };
+
+  const handleAssignFee = async (e) => {
+    e.preventDefault();
+    if (!feeForm.studentId || !feeForm.amount || !feeForm.term || !feeForm.dueDate) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+    setIsAssigningFee(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('/Fees/assign', feeForm, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Fee assigned successfully!");
+      setFeeForm({ studentId: '', amount: '', term: 'Term 1', dueDate: '', description: 'Tuition Fee' });
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to assign fee");
+    } finally {
+      setIsAssigningFee(false);
+    }
+  };
+
+  const handleToggleFeeStatus = async (feeId, currentStatus) => {
+    const nextStatus = currentStatus === 'Paid' ? 'Unpaid' : 'Paid';
+    try {
+      const token = localStorage.getItem('token');
+      await axios.patch(`/Fees/${feeId}`, { status: nextStatus }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert(`Fee marked as ${nextStatus}!`);
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to update fee status");
+    }
+  };
+
+  const handleDeleteFee = async (feeId) => {
+    if (!window.confirm("Are you sure you want to delete this fee record? This action cannot be undone.")) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`/Fees/${feeId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Fee record deleted successfully.");
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to delete fee record");
+    }
+  };
+
+  const handleAssignSalary = async (e) => {
+    e.preventDefault();
+    if (!salaryForm.teacherId || !salaryForm.amount || !salaryForm.term || !salaryForm.dueDate) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+    setIsAssigningSalary(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('/Salaries/assign', salaryForm, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Salary assigned successfully!");
+      setSalaryForm({ teacherId: '', amount: '', term: 'Term 1', dueDate: '', description: 'Monthly Base Salary' });
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to assign salary");
+    } finally {
+      setIsAssigningSalary(false);
+    }
+  };
+
+  const handleToggleSalaryStatus = async (salaryId, currentStatus) => {
+    const nextStatus = currentStatus === 'Paid' ? 'Unpaid' : 'Paid';
+    try {
+      const token = localStorage.getItem('token');
+      await axios.patch(`/Salaries/${salaryId}`, { status: nextStatus }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert(`Salary marked as ${nextStatus}!`);
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to update salary status");
+    }
+  };
+
+  const handleDeleteSalary = async (salaryId) => {
+    if (!window.confirm("Are you sure you want to delete this salary record? This action cannot be undone.")) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`/Salaries/${salaryId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Salary record deleted successfully.");
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to delete salary record");
     }
   };
   const handleEmergencyBroadcast = async (e) => {
@@ -544,6 +825,18 @@ const ManagerDashboard = () => {
     }
   };
 
+  const handleRevokeUser = async (userId) => {
+    if (!window.confirm("Are you sure you want to revoke this user's access? They will not be able to log in until approved again.")) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.patch(`/User/deactivate/${userId}`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      alert("User access revoked successfully!");
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to revoke user");
+    }
+  };
+
   const handleDeleteClass = async (classId) => {
     if (!window.confirm("Delete this class? This cannot be undone.")) return;
     try {
@@ -607,11 +900,7 @@ const ManagerDashboard = () => {
   };
 
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
-    </div>
-  );
+  if (loading) return <ManagerSkeleton />;
 
   const StatCard = ({ icon: Icon, label, value, color, onClick }) => (
     <div
@@ -674,6 +963,13 @@ const ManagerDashboard = () => {
         >
           <FileText size={20} />
           <span>Add Users</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('finance')}
+          className={`tab-btn ${activeTab === 'finance' ? 'active' : ''}`}
+        >
+          <CreditCard size={20} />
+          <span>Finance</span>
         </button>
       </nav>
       {activeTab === 'overview' && (
@@ -931,7 +1227,7 @@ const ManagerDashboard = () => {
             <div className="table-container custom-scrollbar" style={{ maxHeight: '500px', overflowY: 'auto' }}>
               <table style={{ width: '100%', position: 'relative' }}>
                 <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--bg-tertiary)', boxShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
-                  <tr><th>Name</th><th>Role</th><th>Classes</th><th>Status</th><th>Class Action</th></tr>
+                  <tr><th>Name</th><th>Role</th><th>Classes</th><th>Status</th><th>Actions</th></tr>
                 </thead>
                 <tbody>
                   {[...stats.teachers, ...stats.students]
@@ -976,9 +1272,15 @@ const ManagerDashboard = () => {
                             <span className="text-xs opacity-40 italic">Unassigned</span>
                           )}
                         </td>
-                        <td><span className="text-xs text-green-400">Approved</span></td>
                         <td>
-                        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+                          {u.isApproved ? (
+                            <span className="badge badge-success px-3 py-1 shadow-[0_0_10px_rgba(0,255,136,0.2)]">Approved</span>
+                          ) : (
+                            <span className="badge px-3 py-1 shadow-[0_0_10px_rgba(239,68,68,0.2)]" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }}>Deactivated</span>
+                          )}
+                        </td>
+                        <td>
+                        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                           <button
                             onClick={() => setSelectedUser(u)}
                             style={{
@@ -1000,6 +1302,53 @@ const ManagerDashboard = () => {
                           >
                             <Plus className="w-3.5 h-3.5" /> Assign
                           </button>
+
+                          {u.isApproved ? (
+                            <button
+                              onClick={() => handleRevokeUser(u._id)}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '8px',
+                                background: 'rgba(249, 115, 22, 0.1)', color: '#f97316', border: '1px solid rgba(249, 115, 22, 0.3)',
+                                fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer',
+                                transition: 'all 0.3s ease'
+                              }}
+                              onMouseEnter={e => {
+                                e.currentTarget.style.background = '#f97316';
+                                e.currentTarget.style.color = '#000';
+                                e.currentTarget.style.boxShadow = '0 0 15px rgba(249, 115, 22, 0.5)';
+                              }}
+                              onMouseLeave={e => {
+                                e.currentTarget.style.background = 'rgba(249, 115, 22, 0.1)';
+                                e.currentTarget.style.color = '#f97316';
+                                e.currentTarget.style.boxShadow = 'none';
+                              }}
+                            >
+                              <UserMinus className="w-3.5 h-3.5" /> Revoke
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleApprove(u._id)}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '8px',
+                                background: 'rgba(0, 255, 136, 0.1)', color: '#00ff88', border: '1px solid rgba(0, 255, 136, 0.3)',
+                                fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer',
+                                transition: 'all 0.3s ease'
+                              }}
+                              onMouseEnter={e => {
+                                e.currentTarget.style.background = '#00ff88';
+                                e.currentTarget.style.color = '#000';
+                                e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 255, 136, 0.5)';
+                              }}
+                              onMouseLeave={e => {
+                                e.currentTarget.style.background = 'rgba(0, 255, 136, 0.1)';
+                                e.currentTarget.style.color = '#00ff88';
+                                e.currentTarget.style.boxShadow = 'none';
+                              }}
+                            >
+                              <UserCheck className="w-3.5 h-3.5" /> Approve
+                            </button>
+                          )}
+
                           <button
                             onClick={() => handleDeleteUser(u._id)}
                             style={{
@@ -1217,6 +1566,515 @@ const ManagerDashboard = () => {
 
             <BulkImportWidget onImportSuccess={fetchData} />
           </div>
+        </div>
+      )}
+      {activeTab === 'finance' && (
+        <div className="animate-in slide-in-from-bottom-4 duration-500 w-full">
+          {/* Sub-tab Navigation */}
+          <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.75rem' }}>
+            <button
+              type="button"
+              onClick={() => setFinanceSubTab('fees')}
+              className={`tab-btn ${financeSubTab === 'fees' ? 'active' : ''}`}
+              style={{ padding: '0.5rem 1.25rem', fontSize: '0.85rem', height: 'auto' }}
+            >
+              Student Fees
+            </button>
+            <button
+              type="button"
+              onClick={() => setFinanceSubTab('salaries')}
+              className={`tab-btn ${financeSubTab === 'salaries' ? 'active' : ''}`}
+              style={{ padding: '0.5rem 1.25rem', fontSize: '0.85rem', height: 'auto' }}
+            >
+              Teacher Salaries
+            </button>
+          </div>
+
+          {financeSubTab === 'fees' && (
+            <div>
+              {/* Fees Stats Summary Cards */}
+              <div className="dashboard-grid">
+                <div className="glass-card flex flex-col justify-between" style={{ padding: '1.5rem', aspectRatio: '1.8 / 1' }}>
+                  <div>
+                    <p className="text-muted text-xs font-medium uppercase tracking-wider">Total Fees Billed</p>
+                    <h3 className="text-2xl font-bold mt-1 text-white">
+                      ${feesList.reduce((sum, f) => sum + (f.amount || 0), 0).toLocaleString()}
+                    </h3>
+                  </div>
+                  <div className="p-2 rounded-lg bg-blue-500/10 border border-blue-500/20 w-fit">
+                    <DollarSign className="w-5 h-5 text-blue-400" />
+                  </div>
+                </div>
+                <div className="glass-card flex flex-col justify-between" style={{ padding: '1.5rem', aspectRatio: '1.8 / 1' }}>
+                  <div>
+                    <p className="text-muted text-xs font-medium uppercase tracking-wider">Total Fees Collected</p>
+                    <h3 className="text-2xl font-bold mt-1 text-green-400">
+                      ${feesList.filter(f => f.status === 'Paid').reduce((sum, f) => sum + (f.amount || 0), 0).toLocaleString()}
+                    </h3>
+                  </div>
+                  <div className="p-2 rounded-lg bg-green-500/10 border border-green-500/20 w-fit">
+                    <ShieldCheck className="w-5 h-5 text-green-400" />
+                  </div>
+                </div>
+                <div className="glass-card flex flex-col justify-between" style={{ padding: '1.5rem', aspectRatio: '1.8 / 1' }}>
+                  <div>
+                    <p className="text-muted text-xs font-medium uppercase tracking-wider">Outstanding Amount</p>
+                    <h3 className="text-2xl font-bold mt-1 text-red-400">
+                      ${feesList.filter(f => f.status === 'Unpaid').reduce((sum, f) => sum + (f.amount || 0), 0).toLocaleString()}
+                    </h3>
+                  </div>
+                  <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20 w-fit">
+                    <Clock className="w-5 h-5 text-red-400" />
+                  </div>
+                </div>
+                <div className="glass-card flex flex-col justify-between" style={{ padding: '1.5rem', aspectRatio: '1.8 / 1' }}>
+                  <div>
+                    <p className="text-muted text-xs font-medium uppercase tracking-wider">Collection Rate</p>
+                    <h3 className="text-2xl font-bold mt-1 text-cyan-400">
+                      {feesList.length > 0
+                        ? `${Math.round((feesList.filter(f => f.status === 'Paid').length / feesList.length) * 100)}%`
+                        : '0%'}
+                    </h3>
+                  </div>
+                  <div className="p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 w-fit">
+                    <Users className="w-5 h-5 text-cyan-400" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="dashboard-grid mt-10" style={{ gridTemplateColumns: 'repeat(12, 1fr)' }}>
+                {/* Assign Fee Form */}
+                <div className="glass-card" style={{ gridColumn: 'span 4' }}>
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-cyan-400">
+                    <DollarSign className="w-5 h-5" />
+                    Assign New Fee
+                  </h3>
+                  <form onSubmit={handleAssignFee} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div className="form-group">
+                      <label>Select Student</label>
+                      <select
+                        value={feeForm.studentId}
+                        required
+                        onChange={e => setFeeForm({ ...feeForm, studentId: e.target.value })}
+                      >
+                        <option value="">-- Select Student --</option>
+                        {stats.students.map(s => (
+                          <option key={s._id} value={s._id}>{s.name} ({s.email})</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Fee Amount ($)</label>
+                      <input
+                        type="number"
+                        min="1"
+                        required
+                        value={feeForm.amount}
+                        placeholder="Enter amount"
+                        onChange={e => setFeeForm({ ...feeForm, amount: Number(e.target.value) })}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Term</label>
+                      <select
+                        value={feeForm.term}
+                        onChange={e => setFeeForm({ ...feeForm, term: e.target.value })}
+                      >
+                        <option value="Term 1">Term 1</option>
+                        <option value="Term 2">Term 2</option>
+                        <option value="Term 3">Term 3</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Due Date</label>
+                      <input
+                        type="date"
+                        required
+                        value={feeForm.dueDate}
+                        onChange={e => setFeeForm({ ...feeForm, dueDate: e.target.value })}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Description</label>
+                      <input
+                        type="text"
+                        value={feeForm.description}
+                        placeholder="e.g. Tuition Fee, Bus Fee"
+                        onChange={e => setFeeForm({ ...feeForm, description: e.target.value })}
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isAssigningFee}
+                      className="btn btn-primary"
+                      style={{ width: '100%', marginTop: '1rem', fontWeight: 'bold' }}
+                    >
+                      {isAssigningFee ? 'Assigning...' : 'Assign Fee'}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Fees Directory Table */}
+                <div className="glass-card" style={{ gridColumn: 'span 8' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                    <h3 className="text-xl font-bold flex items-center gap-2 text-white">
+                      <CreditCard className="w-5 h-5 text-cyan-400" />
+                      Fees Directory
+                    </h3>
+                    <div style={{ display: 'flex', gap: '0.5rem', flex: 1, justifySelf: 'end', maxWidth: '400px' }}>
+                      <select
+                        value={feeFilterStatus}
+                        onChange={e => setFeeFilterStatus(e.target.value)}
+                        style={{ flex: 1, padding: '6px 10px', fontSize: '0.85rem' }}
+                      >
+                        <option value="All">All Statuses</option>
+                        <option value="Paid">Paid Only</option>
+                        <option value="Unpaid">Unpaid Only</option>
+                      </select>
+                      <input
+                        type="text"
+                        placeholder="Search student..."
+                        value={feeSearchQuery}
+                        onChange={e => setFeeSearchQuery(e.target.value)}
+                        style={{ flex: 1.5, padding: '6px 10px 6px 12px', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="table-container custom-scrollbar" style={{ maxHeight: '420px', overflowY: 'auto' }}>
+                    <table style={{ width: '100%' }}>
+                      <thead>
+                        <tr>
+                          <th>Student</th>
+                          <th>Description</th>
+                          <th>Term</th>
+                          <th>Amount</th>
+                          <th>Due Date</th>
+                          <th>Status</th>
+                          <th style={{ textAlign: 'center' }}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {feesList
+                          .filter(f => {
+                            const matchesSearch = !feeSearchQuery || (f.student?.name || '').toLowerCase().includes(feeSearchQuery.toLowerCase());
+                            const matchesStatus = feeFilterStatus === 'All' || f.status === feeFilterStatus;
+                            return matchesSearch && matchesStatus;
+                          })
+                          .map(f => (
+                            <tr key={f._id}>
+                              <td className="font-medium">
+                                <div>{f.student?.name || 'Deleted User'}</div>
+                                <span style={{ fontSize: '10px', opacity: 0.6 }}>{f.student?.email}</span>
+                              </td>
+                              <td><span className="text-xs">{f.description}</span></td>
+                              <td><span className="text-xs">{f.term}</span></td>
+                              <td className="font-bold text-white">${f.amount}</td>
+                              <td><span className="text-xs">{new Date(f.dueDate).toLocaleDateString()}</span></td>
+                              <td>
+                                {f.status === 'Paid' ? (
+                                  <span className="badge badge-success px-3 py-1 shadow-[0_0_10px_rgba(0,255,136,0.2)]">Paid</span>
+                                ) : (
+                                  <span className="badge px-3 py-1 shadow-[0_0_10px_rgba(239,68,68,0.2)]" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '20px', fontSize: '11px' }}>Unpaid</span>
+                                )}
+                              </td>
+                              <td>
+                                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                                  <button
+                                    onClick={() => handleToggleFeeStatus(f._id, f.status)}
+                                    className="btn"
+                                    style={{
+                                      padding: '4px 10px',
+                                      fontSize: '10px',
+                                      borderRadius: '6px',
+                                      border: `1px solid ${f.status === 'Paid' ? 'rgba(239,68,68,0.3)' : 'rgba(0,255,136,0.3)'}`,
+                                      background: f.status === 'Paid' ? 'rgba(239,68,68,0.1)' : 'rgba(0,255,136,0.1)',
+                                      color: f.status === 'Paid' ? '#ef4444' : '#00ff88',
+                                      fontWeight: 'bold',
+                                      cursor: 'pointer',
+                                      transition: 'all 0.2s'
+                                    }}
+                                  >
+                                    {f.status === 'Paid' ? 'Mark Unpaid' : 'Mark Paid'}
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteFee(f._id)}
+                                    className="btn"
+                                    style={{
+                                      padding: '4px 10px',
+                                      fontSize: '10px',
+                                      borderRadius: '6px',
+                                      border: '1px solid rgba(255,0,85,0.3)',
+                                      background: 'rgba(255,0,85,0.1)',
+                                      color: '#ff5c8d',
+                                      fontWeight: 'bold',
+                                      cursor: 'pointer',
+                                      transition: 'all 0.2s'
+                                    }}
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        {feesList.length === 0 && (
+                          <tr>
+                            <td colSpan="7" className="text-center text-muted italic" style={{ padding: '2rem' }}>
+                              No fees assigned yet.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {financeSubTab === 'salaries' && (
+            <div>
+              {/* Salaries Stats Summary Cards */}
+              <div className="dashboard-grid">
+                <div className="glass-card flex flex-col justify-between" style={{ padding: '1.5rem', aspectRatio: '1.8 / 1' }}>
+                  <div>
+                    <p className="text-muted text-xs font-medium uppercase tracking-wider">Total Salaries Billed</p>
+                    <h3 className="text-2xl font-bold mt-1 text-white">
+                      ${salariesList.reduce((sum, s) => sum + (s.amount || 0), 0).toLocaleString()}
+                    </h3>
+                  </div>
+                  <div className="p-2 rounded-lg bg-blue-500/10 border border-blue-500/20 w-fit">
+                    <DollarSign className="w-5 h-5 text-blue-400" />
+                  </div>
+                </div>
+                <div className="glass-card flex flex-col justify-between" style={{ padding: '1.5rem', aspectRatio: '1.8 / 1' }}>
+                  <div>
+                    <p className="text-muted text-xs font-medium uppercase tracking-wider">Total Salaries Paid</p>
+                    <h3 className="text-2xl font-bold mt-1 text-green-400">
+                      ${salariesList.filter(s => s.status === 'Paid').reduce((sum, s) => sum + (s.amount || 0), 0).toLocaleString()}
+                    </h3>
+                  </div>
+                  <div className="p-2 rounded-lg bg-green-500/10 border border-green-500/20 w-fit">
+                    <ShieldCheck className="w-5 h-5 text-green-400" />
+                  </div>
+                </div>
+                <div className="glass-card flex flex-col justify-between" style={{ padding: '1.5rem', aspectRatio: '1.8 / 1' }}>
+                  <div>
+                    <p className="text-muted text-xs font-medium uppercase tracking-wider">Outstanding Salaries</p>
+                    <h3 className="text-2xl font-bold mt-1 text-red-400">
+                      ${salariesList.filter(s => s.status === 'Unpaid').reduce((sum, s) => sum + (s.amount || 0), 0).toLocaleString()}
+                    </h3>
+                  </div>
+                  <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20 w-fit">
+                    <Clock className="w-5 h-5 text-red-400" />
+                  </div>
+                </div>
+                <div className="glass-card flex flex-col justify-between" style={{ padding: '1.5rem', aspectRatio: '1.8 / 1' }}>
+                  <div>
+                    <p className="text-muted text-xs font-medium uppercase tracking-wider font-outfit">Payment Rate</p>
+                    <h3 className="text-2xl font-bold mt-1 text-cyan-400">
+                      {salariesList.length > 0
+                        ? `${Math.round((salariesList.filter(s => s.status === 'Paid').length / salariesList.length) * 100)}%`
+                        : '0%'}
+                    </h3>
+                  </div>
+                  <div className="p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 w-fit">
+                    <Users className="w-5 h-5 text-cyan-400" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="dashboard-grid mt-10" style={{ gridTemplateColumns: 'repeat(12, 1fr)' }}>
+                {/* Assign Salary Form */}
+                <div className="glass-card" style={{ gridColumn: 'span 4' }}>
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-cyan-400">
+                    <DollarSign className="w-5 h-5" />
+                    Assign Teacher Salary
+                  </h3>
+                  <form onSubmit={handleAssignSalary} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div className="form-group">
+                      <label>Select Teacher</label>
+                      <select
+                        value={salaryForm.teacherId}
+                        required
+                        onChange={e => setSalaryForm({ ...salaryForm, teacherId: e.target.value })}
+                      >
+                        <option value="">-- Select Teacher --</option>
+                        {stats.teachers.map(t => (
+                          <option key={t._id} value={t._id}>{t.name} ({t.email})</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Salary Amount ($)</label>
+                      <input
+                        type="number"
+                        min="1"
+                        required
+                        value={salaryForm.amount}
+                        placeholder="Enter amount"
+                        onChange={e => setSalaryForm({ ...salaryForm, amount: Number(e.target.value) })}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Term</label>
+                      <select
+                        value={salaryForm.term}
+                        onChange={e => setSalaryForm({ ...salaryForm, term: e.target.value })}
+                      >
+                        <option value="Term 1">Term 1</option>
+                        <option value="Term 2">Term 2</option>
+                        <option value="Term 3">Term 3</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Payment Due Date</label>
+                      <input
+                        type="date"
+                        required
+                        value={salaryForm.dueDate}
+                        onChange={e => setSalaryForm({ ...salaryForm, dueDate: e.target.value })}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Description</label>
+                      <input
+                        type="text"
+                        value={salaryForm.description}
+                        placeholder="e.g. Monthly Base Salary, Bonus"
+                        onChange={e => setSalaryForm({ ...salaryForm, description: e.target.value })}
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isAssigningSalary}
+                      className="btn btn-primary"
+                      style={{ width: '100%', marginTop: '1rem', fontWeight: 'bold' }}
+                    >
+                      {isAssigningSalary ? 'Assigning...' : 'Assign Salary'}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Salaries Directory Table */}
+                <div className="glass-card" style={{ gridColumn: 'span 8' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                    <h3 className="text-xl font-bold flex items-center gap-2 text-white">
+                      <CreditCard className="w-5 h-5 text-cyan-400" />
+                      Salaries Directory
+                    </h3>
+                    <div style={{ display: 'flex', gap: '0.5rem', flex: 1, justifySelf: 'end', maxWidth: '400px' }}>
+                      <select
+                        value={salaryFilterStatus}
+                        onChange={e => setSalaryFilterStatus(e.target.value)}
+                        style={{ flex: 1, padding: '6px 10px', fontSize: '0.85rem' }}
+                      >
+                        <option value="All">All Statuses</option>
+                        <option value="Paid">Paid Only</option>
+                        <option value="Unpaid">Unpaid Only</option>
+                      </select>
+                      <input
+                        type="text"
+                        placeholder="Search teacher..."
+                        value={salarySearchQuery}
+                        onChange={e => setSalarySearchQuery(e.target.value)}
+                        style={{ flex: 1.5, padding: '6px 10px 6px 12px', fontSize: '0.85rem' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="table-container custom-scrollbar" style={{ maxHeight: '420px', overflowY: 'auto' }}>
+                    <table style={{ width: '100%' }}>
+                      <thead>
+                        <tr>
+                          <th>Teacher</th>
+                          <th>Description</th>
+                          <th>Term</th>
+                          <th>Amount</th>
+                          <th>Due Date</th>
+                          <th>Status</th>
+                          <th style={{ textAlign: 'center' }}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {salariesList
+                          .filter(s => {
+                            const matchesSearch = !salarySearchQuery || (s.teacher?.name || '').toLowerCase().includes(salarySearchQuery.toLowerCase());
+                            const matchesStatus = salaryFilterStatus === 'All' || s.status === salaryFilterStatus;
+                            return matchesSearch && matchesStatus;
+                          })
+                          .map(s => (
+                            <tr key={s._id}>
+                              <td className="font-medium">
+                                <div>{s.teacher?.name || 'Deleted User'}</div>
+                                <span style={{ fontSize: '10px', opacity: 0.6 }}>{s.teacher?.email}</span>
+                              </td>
+                              <td><span className="text-xs">{s.description}</span></td>
+                              <td><span className="text-xs">{s.term}</span></td>
+                              <td className="font-bold text-white">${s.amount}</td>
+                              <td><span className="text-xs">{new Date(s.dueDate).toLocaleDateString()}</span></td>
+                              <td>
+                                {s.status === 'Paid' ? (
+                                  <span className="badge badge-success px-3 py-1 shadow-[0_0_10px_rgba(0,255,136,0.2)]">Paid</span>
+                                ) : (
+                                  <span className="badge px-3 py-1 shadow-[0_0_10px_rgba(239,68,68,0.2)]" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '20px', fontSize: '11px' }}>Unpaid</span>
+                                )}
+                              </td>
+                              <td>
+                                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                                  <button
+                                    onClick={() => handleToggleSalaryStatus(s._id, s.status)}
+                                    className="btn"
+                                    style={{
+                                      padding: '4px 10px',
+                                      fontSize: '10px',
+                                      borderRadius: '6px',
+                                      border: `1px solid ${s.status === 'Paid' ? 'rgba(239,68,68,0.3)' : 'rgba(0,255,136,0.3)'}`,
+                                      background: s.status === 'Paid' ? 'rgba(239,68,68,0.1)' : 'rgba(0,255,136,0.1)',
+                                      color: s.status === 'Paid' ? '#ef4444' : '#00ff88',
+                                      fontWeight: 'bold',
+                                      cursor: 'pointer',
+                                      transition: 'all 0.2s'
+                                    }}
+                                  >
+                                    {s.status === 'Paid' ? 'Mark Unpaid' : 'Mark Paid'}
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteSalary(s._id)}
+                                    className="btn"
+                                    style={{
+                                      padding: '4px 10px',
+                                      fontSize: '10px',
+                                      borderRadius: '6px',
+                                      border: '1px solid rgba(255,0,85,0.3)',
+                                      background: 'rgba(255,0,85,0.1)',
+                                      color: '#ff5c8d',
+                                      fontWeight: 'bold',
+                                      cursor: 'pointer',
+                                      transition: 'all 0.2s'
+                                    }}
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        {salariesList.length === 0 && (
+                          <tr>
+                            <td colSpan="7" className="text-center text-muted italic" style={{ padding: '2rem' }}>
+                              No salary records assigned yet.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
       {/* Create Class Modal */}

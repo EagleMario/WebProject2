@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { PlusCircle, Users, BookMarked, Save, Calendar } from 'lucide-react';
+import { PlusCircle, Users, BookMarked, Save, Calendar, CreditCard } from 'lucide-react';
 
 const TeacherDashboard = () => {
   const [classes, setClasses] = useState([]);
@@ -11,6 +11,7 @@ const TeacherDashboard = () => {
   const [assignments, setAssignments] = useState([]);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [assignmentSubmissions, setAssignmentSubmissions] = useState([]);
+  const [mySalaries, setMySalaries] = useState([]);
 
   // Modals / Forms state
   const [showAddClass, setShowAddClass] = useState(false);
@@ -41,12 +42,13 @@ const TeacherDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const [classRes, examRes, studentsRes, statsRes, schedulesRes] = await Promise.all([
+      const [classRes, examRes, studentsRes, statsRes, schedulesRes, salariesRes] = await Promise.all([
         axios.get('/Class/all'),
         axios.get('/Exam/all'),
         axios.get('/User/all?role=student'),
         axios.get('/DashBoard/teacher-stats').catch(() => ({ data: { data: { totalExams: 0, RecentGrades: [] } } })),
-        axios.get('/ExamSchedule').catch(() => ({ data: { data: { schedules: [] } } }))
+        axios.get('/ExamSchedule').catch(() => ({ data: { data: { schedules: [] } } })),
+        axios.get('/Salaries/my-salaries').catch(() => ({ data: { data: { salaries: [] } } }))
       ]);
       setClasses(classRes.data.data.classes);
       setExams(examRes.data.data.exams);
@@ -65,6 +67,7 @@ const TeacherDashboard = () => {
       setStudents(onlyStudents);
       setStats(statsRes.data?.data || { totalExams: 0, RecentGrades: [] });
       setExamSchedules(schedulesRes.data.data.schedules || []);
+      setMySalaries(salariesRes.data.data?.salaries || []);
     } catch (error) {
       console.error('Error fetching teacher data', error);
     }
@@ -233,6 +236,12 @@ const TeacherDashboard = () => {
           <h2 style={{ fontSize: '2.5rem', margin: '0', color: 'var(--success)' }}>{stats.RecentGrades?.length || 0}</h2>
           <p style={{ color: 'var(--text-muted)', fontWeight: '600', fontSize: '0.9rem' }}>Recent Grades Posted</p>
         </div>
+        <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', borderLeft: `4px solid ${mySalaries.some(s => s.status === 'Unpaid') ? 'var(--danger)' : 'var(--success)'}` }}>
+          <h2 style={{ fontSize: '2.5rem', margin: '0', color: mySalaries.some(s => s.status === 'Unpaid') ? 'var(--danger)' : 'var(--success)' }}>
+            {mySalaries.filter(s => s.status === 'Unpaid').length}
+          </h2>
+          <p style={{ color: 'var(--text-muted)', fontWeight: '600', fontSize: '0.9rem' }}>Pending Payments</p>
+        </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -360,6 +369,61 @@ const TeacherDashboard = () => {
                           <td>{sch.Day}</td>
                         </tr>
                       );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* My Salaries & Payments */}
+        <div className="glass-card">
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', color: 'var(--accent-neon)' }}>
+            <CreditCard size={20} /> My Salaries & Payments
+          </h3>
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>Term</th>
+                  <th>Amount</th>
+                  <th>Due Date</th>
+                  <th>Status</th>
+                  <th>Payment Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mySalaries.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="text-center text-muted" style={{ padding: '1rem' }}>
+                      No salary records assigned.
+                    </td>
+                  </tr>
+                ) : (
+                  mySalaries.map(salary => {
+                    const isOverdue = salary.status === 'Unpaid' && new Date(salary.dueDate) < new Date();
+                    return (
+                      <tr key={salary._id} style={{ borderLeft: salary.status === 'Unpaid' ? '3px solid var(--danger)' : 'none' }}>
+                        <td className="font-bold">{salary.description}</td>
+                        <td>{salary.term}</td>
+                        <td className="font-bold text-white">${salary.amount}</td>
+                        <td style={{ color: isOverdue ? 'var(--danger)' : 'inherit' }}>
+                          {new Date(salary.dueDate).toLocaleDateString()}
+                          {isOverdue && (
+                            <span style={{ fontSize: '10px', color: 'var(--danger)', marginLeft: '8px', fontWeight: 'bold' }}>(OVERDUE)</span>
+                          )}
+                        </td>
+                        <td>
+                          {salary.status === 'Paid' ? (
+                            <span className="badge badge-success px-3 py-1 shadow-[0_0_10px_rgba(0,255,136,0.2)]">Paid</span>
+                          ) : (
+                            <span className="badge px-3 py-1 shadow-[0_0_10px_rgba(239,68,68,0.2)]" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '20px', fontSize: '11px' }}>Unpaid</span>
+                          )}
+                        </td>
+                        <td>{salary.paidDate ? new Date(salary.paidDate).toLocaleDateString() : '-'}</td>
+                      </tr>
+                    );
                   })
                 )}
               </tbody>
