@@ -1,9 +1,9 @@
-module.exports=(err,req,res,next)=>{
-  err.StatusCode=err.StatusCode||500;
-  err.status=err.status||'error';
+export default (err, req, res, next) => {
+  err.StatusCode = err.StatusCode || 500;
+  err.status = err.status || 'error';
 
   res.status(err.StatusCode).json({
-    status:err.status,
-    message:err.message
+    status: err.status,
+    message: err.message
   });
 };

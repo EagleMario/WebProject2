@@ -1,17 +1,23 @@
-require('dotenv').config();
-const express = require('express');
-const http = require('http');
-const { PrismaClient } = require('@prisma/client');
-const cors = require('cors');
-const path = require('path');
+import 'dotenv/config.js';
+import express from 'express';
+import http from 'http';
+import { PrismaClient } from '@prisma/client';
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Initialize Express app
-const app = require('./app');
+import app from './app.js';
 const prisma = new PrismaClient();
 
 // Create HTTP server with Socket.IO
 const server = http.createServer(app);
-const io = require('socket.io')(server, {
+import { Server as SocketIOServer } from 'socket.io';
+const io = new SocketIOServer(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
@@ -23,7 +29,7 @@ app.set('socketio', io);
 app.set('prisma', prisma);
 
 // Connect to Database
-const ConnectDB = require('./Config/DB.js');
+import ConnectDB from './Config/DB.js';
 ConnectDB();
 
 // Connect to PostgreSQL
@@ -40,7 +46,7 @@ async function connectPostgres() {
 connectPostgres();
 
 // Initialize Workers
-require('./src/Core/Workers/reportWorker');
+import './src/Core/Workers/reportWorker.js';
 
 // Socket.IO Connection Handler
 io.on('connection', (socket) => {

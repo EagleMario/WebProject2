@@ -1,7 +1,7 @@
-const { PrismaClient } = require('@prisma/client')
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-exports.getTopTeachersService = async () => {
+export const getTopTeachersService = async () => {
     try {
         const topTeachers = await prisma.$queryRaw`
             WITH TeacherStats AS (
@@ -43,7 +43,7 @@ exports.getTopTeachersService = async () => {
     }
 };
 
-exports.calculateStudentsGpaService = async () => {
+export const calculateStudentsGpaService = async () => {
     try {
         const studentsGpa = await prisma.$queryRaw`
             WITH StudentTotals AS (

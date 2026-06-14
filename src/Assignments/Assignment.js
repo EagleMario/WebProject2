@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const AssignmentSchema = new Schema({
@@ -36,4 +36,4 @@ const AssignmentSchema = new Schema({
     },
 }, { timestamps: true });
 
-module.exports = mongoose.model("Assignment", AssignmentSchema);
+export default mongoose.model("Assignment", AssignmentSchema);

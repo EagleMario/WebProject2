@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const ExamController = require('./ExamController.js');
-const { protect, restrictTo } = require('../Core/MiddleWare/UserMiddleWare.js');
+import * as ExamController from './ExamController.js';
+import { protect, restrictTo } from '../Core/MiddleWare/UserMiddleWare.js';
 
 router.post('/submit', ExamController.submitExam);
 router.post('/add', protect, restrictTo('Teacher'), ExamController.CreateExam);
@@ -12,4 +12,4 @@ router.delete('/:id', protect, restrictTo('Teacher'), ExamController.deleteExam)
 router.get('/available', protect, restrictTo('student', 'Student'), ExamController.GetAvailableExams);
 router.post('/submit', protect, restrictTo('student', 'Student'), ExamController.SubmitExam);
 
-module.exports = router;
+export default router;

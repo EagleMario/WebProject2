@@ -1,10 +1,10 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const GradeController = require('./GradeController.js');
-const { protect, restrictTo } = require('../Core/MiddleWare/UserMiddleWare.js');
+import * as GradeController from './GradeController.js';
+import { protect, restrictTo } from '../Core/MiddleWare/UserMiddleWare.js';
 
 router.post('/add', protect, restrictTo('Teacher'), GradeController.addGrade);
 
 router.get('/exam/:examId', protect, restrictTo('Teacher'), GradeController.getExamGrades);
 
-module.exports = router;
+export default router;

@@ -1,12 +1,12 @@
-const User = require('../Users/User.js');
-const Exam = require('../Exams/exam.js');
-const Class = require('../Classes/class.js');
-const Grade = require('../Grades/Grade.js');
-const AppError = require('../Core/Utils/appError.js');
-const catchasync = require('../Core/Utils/CatchAsync.js');
-const dashboardService = require('./DashboardServices.js');
+import User from '../Users/User.js';
+import Exam from '../Exams/exam.js';
+import Class from '../Classes/class.js';
+import Grade from '../Grades/Grade.js';
+import AppError from '../Core/Utils/appError.js';
+import catchasync from '../Core/Utils/CatchAsync.js';
+import * as dashboardService from './DashboardServices.js';
 
-exports.GetManagerDash = catchasync(async (req, res) => {
+export const GetManagerDash = catchasync(async (req, res) => {
     const UserId = req.user.id;
 
     const [classes, teachers, students, exams] = await Promise.all([
@@ -25,7 +25,7 @@ exports.GetManagerDash = catchasync(async (req, res) => {
         }
     });
 });
-exports.GetTeacherDash = catchasync(async (req, res) => {
+export const GetTeacherDash = catchasync(async (req, res) => {
 
     const teacherExams = await Exam.find({ teacher: req.user.id });
     const examsId = teacherExams.map(e => e._id);
@@ -46,7 +46,7 @@ exports.GetTeacherDash = catchasync(async (req, res) => {
         }
     });
 });
-exports.getTopTeachers = async (req, res) => {
+export const getTopTeachers = async (req, res) => {
     try {
         // 2. بتنادي على الدالة بالاسم الجديد
         const topTeachersData = await dashboardService.getTopTeachersService();
@@ -61,7 +61,7 @@ exports.getTopTeachers = async (req, res) => {
     }
 };
 // هنضيف الدالة دي مع دالة getTopTeachers اللي عملناها قبل كدا
-exports.getStudentsGPA = async (req, res) => {
+export const getStudentsGPA = async (req, res) => {
     try {
         const studentsGpaData = await dashboardService.calculateStudentsGpaService();
         
@@ -74,7 +74,7 @@ exports.getStudentsGPA = async (req, res) => {
         res.status(500).json({ success: false, message: "Server Error" });
     }
 };
-exports.GetStudentDash = catchasync(async (req, res) => {
+export const GetStudentDash = catchasync(async (req, res) => {
 
     const studentId = req.user.id;
     const studentLevel = req.user.level;

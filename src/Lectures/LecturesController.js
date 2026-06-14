@@ -1,10 +1,10 @@
-const lectures = require('./Lecture.js');
-const Class = require('../Classes/class.js');
-const AppError=require('../Core/Utils/appError.js');
-const catchasync=require('../Core/Utils/CatchAsync.js');
-const reportQueue = require('../Core/Queues/reportQueue');
+import lectures from './Lecture.js';
+import Class from '../Classes/class.js';
+import AppError from '../Core/Utils/appError.js';
+import catchasync from '../Core/Utils/CatchAsync.js';
+import reportQueue from '../Core/Queues/reportQueue.js';
 
-exports.generateBulkReports=catchasync(async(req,res,next)=>{
+export const generateBulkReports=catchasync(async(req,res,next)=>{
 const{gradeId,exam}=req.body;
 
 const job=await reportQueue.add('generate-report-job',
@@ -20,7 +20,7 @@ res.staus(200).json({
   jobId:job.id
 });
 });
-exports.addLectures = catchasync (async(req, res, next) => {
+export const addLectures = catchasync (async(req, res, next) => {
 
         const {title, content, description, classId, pdfUrl, externallink, contentUrl} = req.body;
 
@@ -42,13 +42,13 @@ exports.addLectures = catchasync (async(req, res, next) => {
 
 });
 
-exports.GetClassLectures = catchasync (async(req, res) => {
+export const GetClassLectures = catchasync (async(req, res) => {
     const {classId}=req.params;
     const data = await lectures.find({classId}).sort({createdAt:-1});
     console.log(`Fetched ${data.length} Lectures for class ${classId}`);
     res.status(200).json({status:'success',data:{lectures:data}});
 });
-exports.joinLectures =catchasync(async(req, res, next) => {
+export const joinLectures =catchasync(async(req, res, next) => {
     const {lectureId}=req.body;
     const lecture=await lectures.findById(lectureId);
         if(!lecture){
@@ -56,7 +56,7 @@ exports.joinLectures =catchasync(async(req, res, next) => {
         }
         res.status(200).json({message:'Lecture joined successfully',lecture});
 });
-exports.DeleteLectures = catchasync(async (req, res, next) => {
+export const DeleteLectures = catchasync(async (req, res, next) => {
         const {lectureId}=req.body;
         const lecture=await lectures.findById(lectureId);
             if(!lecture){

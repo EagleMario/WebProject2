@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const classController = require('./classController.js');
-const { protect, restrictTo } = require('../Core/MiddleWare/UserMiddleWare.js');
+import * as classController from './classController.js';
+import { protect, restrictTo } from '../Core/MiddleWare/UserMiddleWare.js';
 
 
 router.post('/add', protect, restrictTo('Manager', 'admin'), classController.CreateClass);
@@ -12,4 +12,4 @@ router.post('/add-student', protect, restrictTo('Manager', 'admin'), classContro
 router.delete('/:classId', protect, restrictTo('Manager', 'admin'), classController.deleteClass);
 router.patch('/:classId', protect, restrictTo('Manager', 'admin'), classController.updateClass);
 
-module.exports = router;
+export default router;

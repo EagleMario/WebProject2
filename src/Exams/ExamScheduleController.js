@@ -1,10 +1,10 @@
-const ExamSchedule = require('./ExamSchedule.js');
-const AppError = require('../Core/Utils/appError.js');
-const catchasync = require('../Core/Utils/CatchAsync.js');
-const Exam = require('./exam.js');
-const Class = require('../Classes/class.js');
+import ExamSchedule from './ExamSchedule.js';
+import AppError from '../Core/Utils/appError.js';
+import catchasync from '../Core/Utils/CatchAsync.js';
+import Exam from './exam.js';
+import Class from '../Classes/class.js';
 
-exports.createSchedule = catchasync(async (req, res, next) => {
+export const createSchedule = catchasync(async (req, res, next) => {
     const { ExamId, Date: scheduleDate, Time, Day, classID } = req.body;
 
     if (!ExamId || !scheduleDate || !Time || !Day || !classID) {
@@ -36,7 +36,7 @@ exports.createSchedule = catchasync(async (req, res, next) => {
     });
 });
 
-exports.getAllSchedules = catchasync(async (req, res, next) => {
+export const getAllSchedules = catchasync(async (req, res, next) => {
     const schedules = await ExamSchedule.find();
 
     res.status(200).json({
@@ -48,7 +48,7 @@ exports.getAllSchedules = catchasync(async (req, res, next) => {
     });
 });
 
-exports.getScheduleById = catchasync(async (req, res, next) => {
+export const getScheduleById = catchasync(async (req, res, next) => {
     const schedule = await ExamSchedule.findById(req.params.id);
 
     if (!schedule) {
@@ -63,7 +63,7 @@ exports.getScheduleById = catchasync(async (req, res, next) => {
     });
 });
 
-exports.updateSchedule = catchasync(async (req, res, next) => {
+export const updateSchedule = catchasync(async (req, res, next) => {
     const { id } = req.params;
     
     // Check if schedule exists and belongs to the manager (or if admin)
@@ -89,7 +89,7 @@ exports.updateSchedule = catchasync(async (req, res, next) => {
     });
 });
 
-exports.deleteSchedule = catchasync(async (req, res, next) => {
+export const deleteSchedule = catchasync(async (req, res, next) => {
     const { id } = req.params;
 
     const existingSchedule = await ExamSchedule.findById(id);

@@ -1,11 +1,11 @@
-const Assignment = require('./Assignment.js');
-const AssignmentSubmission = require('./AssignmentSubmission.js');
-const AppError = require('../Core/Utils/appError.js');
-const catchasync = require('../Core/Utils/CatchAsync.js');
-const Class = require('../Classes/class.js');
-const reportQueue = require('../Core/Queues/reportQueue.js');
+import Assignment from './Assignment.js';
+import AssignmentSubmission from './AssignmentSubmission.js';
+import AppError from '../Core/Utils/appError.js';
+import catchasync from '../Core/Utils/CatchAsync.js';
+import Class from '../Classes/class.js';
+import reportQueue from '../Core/Queues/reportQueue.js';
 
-exports.generateBulkReports=catchasync(async(req,res,next)=>{
+export const generateBulkReports=catchasync(async(req,res,next)=>{
 const{gradeId,exam}=req.body;
 
 const job=await reportQueue.add('generate-report-job',
@@ -21,7 +21,7 @@ res.staus(200).json({
   jobId:job.id
 });
 });
-exports.createAssignment = catchasync(async (req, res, next) => {
+export const createAssignment = catchasync(async (req, res, next) => {
     const { title, description, classId, dueDate, maxMark, type } = req.body;
 
     if (!title || !description || !classId || !dueDate || !maxMark) {
@@ -45,7 +45,7 @@ exports.createAssignment = catchasync(async (req, res, next) => {
         data: { assignment }
     });
 });
-exports.getAssignmentsByClass = catchasync(async (req, res, next) => {
+export const getAssignmentsByClass = catchasync(async (req, res, next) => {
     const { classId } = req.params;
     const assignments = await Assignment.find({ classId }).populate('teacherId', 'name');
 
@@ -57,7 +57,7 @@ exports.getAssignmentsByClass = catchasync(async (req, res, next) => {
 });
 
 
-exports.submitAssignment = catchasync(async (req, res, next) => {
+export const submitAssignment = catchasync(async (req, res, next) => {
     const { assignmentId, submissionUrl } = req.body;
 
     if (!assignmentId || !submissionUrl) {
@@ -88,7 +88,7 @@ exports.submitAssignment = catchasync(async (req, res, next) => {
 });
 
 
-exports.getSubmissions = catchasync(async (req, res, next) => {
+export const getSubmissions = catchasync(async (req, res, next) => {
     const { assignmentId } = req.params;
     const submissions = await AssignmentSubmission.find({ assignmentId }).populate('studentId', 'name email');
 
@@ -100,7 +100,7 @@ exports.getSubmissions = catchasync(async (req, res, next) => {
 });
 
 
-exports.gradeSubmission = catchasync(async (req, res, next) => {
+export const gradeSubmission = catchasync(async (req, res, next) => {
     const { submissionId } = req.params;
     const { grade, feedback } = req.body;
 

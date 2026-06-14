@@ -1,6 +1,6 @@
-const express = require('express');
-const ExamSchedule = require('./ExamScheduleController.js');
-const { protect, restrictTo } = require('../Core/MiddleWare/UserMiddleWare.js');
+import express from 'express';
+import * as ExamSchedule from './ExamScheduleController.js';
+import { protect, restrictTo } from '../Core/MiddleWare/UserMiddleWare.js';
 
 const router = express.Router();
 
@@ -14,4 +14,4 @@ router.get('/:id', ExamSchedule.getScheduleById);
 router.patch('/:id', restrictTo('Manager'), ExamSchedule.updateSchedule);
 router.delete('/:id', restrictTo('Manager'), ExamSchedule.deleteSchedule);
 
-module.exports = router;
+export default router;

@@ -1,6 +1,6 @@
-const express = require('express');
-const assignmentController = require('./AssignmentController');
-const { protect, restrictTo } = require('../Core/MiddleWare/UserMiddleWare.js');
+import express from 'express';
+import * as assignmentController from './AssignmentController.js';
+import { protect, restrictTo } from '../Core/MiddleWare/UserMiddleWare.js';
 
 const router = express.Router();
 
@@ -14,4 +14,4 @@ router.post('/submit', restrictTo('student', 'Student'), assignmentController.su
 router.get('/submissions/:assignmentId', restrictTo('Teacher', 'teacher', 'admin'), assignmentController.getSubmissions);
 router.patch('/grade/:submissionId', restrictTo('Teacher', 'teacher', 'admin'), assignmentController.gradeSubmission);
 
-module.exports = router;
+export default router;

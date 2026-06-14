@@ -1,8 +1,8 @@
-const jwt=require('jsonwebtoken');
-const User=require('../../Users/User.js');
-const { roundToNearestMinutes } = require('date-fns');
+import jwt from 'jsonwebtoken';
+import User from '../../Users/User.js';
+import { roundToNearestMinutes } from 'date-fns';
 
-exports.protect=async(req,res,next)=>{
+export const protect=async(req,res,next)=>{
   try{
     let token;
 
@@ -29,7 +29,7 @@ exports.protect=async(req,res,next)=>{
     res.status(401).json({message:"the token is expired !"});
   }
 };
-exports.restrictTo=(...roles)=>{
+export const restrictTo=(...roles)=>{
   return (req,res,next)=>{
 
     const userRole = req.user.role.toLowerCase();

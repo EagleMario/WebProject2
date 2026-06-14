@@ -1,10 +1,10 @@
-const Grade = require('./Grade.js');
-const Exam = require('../Exams/exam.js');
-const AppError=require('../Core/Utils/appError.js');
-const catchasync=require('../Core/Utils/CatchAsync.js');
-const reportQueue = require('../Core/Queues/reportQueue');
+import Grade from './Grade.js';
+import Exam from '../Exams/exam.js';
+import AppError from '../Core/Utils/appError.js';
+import catchasync from '../Core/Utils/CatchAsync.js';
+import reportQueue from '../Core/Queues/reportQueue.js';
 
-exports.generateBulkReports=catchasync(async(req,res,next)=>{
+export const generateBulkReports=catchasync(async(req,res,next)=>{
 const{gradeId,exam}=req.body;
 
 const job=await reportQueue.add('generate-report-job',
@@ -21,7 +21,7 @@ res.staus(200).json({
 });
 });
 
-exports.addGrade = catchasync (async(req, res) => {
+export const addGrade = catchasync (async(req, res) => {
   const NewGrade=await Grade.create({
     exam:req.body.exam,
     studentId:req.body.studentId,
@@ -31,7 +31,7 @@ exports.addGrade = catchasync (async(req, res) => {
   res.status(201).json({status:'success',data:{grade:NewGrade}});
 });
 
-exports.getExamGrades = catchasync (async(req, res) => {
+export const getExamGrades = catchasync (async(req, res) => {
   const exam=await Exam.findById(req.body.examId);
   if(!exam){
     return next(new AppError('Exam not found',404));

@@ -1,9 +1,9 @@
-const { Queue } = require('bullmq');
-const redisConnection = require('../../../Config/redisClient');
+import { Queue } from 'bullmq';
+import redisConnection from '../../../Config/redisClient.js';
 
 // إنشاء الطابور
 const reportQueue = new Queue('ReportCardsQueue', {
   connection: redisConnection,
 });
 
-module.exports = reportQueue;
+export default reportQueue;

@@ -1,10 +1,9 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { OpenAI } = require("openai");
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { OpenAI } from "openai";
+import AppError from '../Core/Utils/appError.js';
+import catchasync from '../Core/Utils/CatchAsync.js';
 
-const AppError = require('../Core/Utils/appError.js');
-const catchasync = require('../Core/Utils/CatchAsync.js');
-
-exports.handleAIChat = catchasync(async (req, res, next) => {
+export const handleAIChat = catchasync(async (req, res, next) => {
     const { message, provider } = req.body;
     const systemPrompt = "You are an AI assistant for a school management system.";
 

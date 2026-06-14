@@ -280,6 +280,87 @@ const LevelColumnWidget = ({ level, levelClasses, onOpenDetails, onAddStudents, 
     )}
   </section>
 );
+
+const BulkImportWidget = ({ onImportSuccess }) => {
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+    setResult(null);
+    setError(null);
+  };
+
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    if (!file) {
+      setError("Please select a file first.");
+      return;
+    }
+    setUploading(true);
+    setResult(null);
+    setError(null);
+
+    const formData = new FormData();
+    formData.append('csvFile', file);
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post('/User/bulk-import', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setResult(res.data);
+      if (onImportSuccess) onImportSuccess();
+      setFile(null);
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || "Failed to upload file");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleUpload} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '500px' }}>
+      <div className="form-group">
+        <label>CSV File</label>
+        <input 
+          type="file" 
+          accept=".csv" 
+          onChange={handleFileChange} 
+          style={{ width: '100%', padding: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#white' }}
+        />
+      </div>
+
+      {error && (
+        <div style={{ color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '10px', borderRadius: '8px', fontSize: '0.9rem' }}>
+          {error}
+        </div>
+      )}
+
+      {result && (
+        <div style={{ color: '#00ff88', background: 'rgba(0, 255, 136, 0.1)', border: '1px solid rgba(0, 255, 136, 0.3)', padding: '10px', borderRadius: '8px', fontSize: '0.9rem' }}>
+          <strong>Success!</strong> {result.message} {result.count !== undefined && `(Count: ${result.count})`}
+        </div>
+      )}
+
+      <button 
+        type="submit" 
+        disabled={uploading || !file} 
+        className="btn btn-primary"
+        style={{ width: '100%', padding: '12px', fontWeight: 'bold' }}
+      >
+        {uploading ? "Uploading..." : "Import Students"}
+      </button>
+    </form>
+  );
+};
+
 const ManagerDashboard = () => {
   const [stats, setStats] = useState({
     classes: [],
@@ -560,6 +641,13 @@ const ManagerDashboard = () => {
         >
           <Calendar size={20} />
           <span>Schedules</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('bulk-import')}
+          className={`tab-btn ${activeTab === 'bulk-import' ? 'active' : ''}`}
+        >
+          <FileText size={20} />
+          <span>Add Users</span>
         </button>
       </nav>
       {activeTab === 'overview' && (
@@ -1023,6 +1111,32 @@ const ManagerDashboard = () => {
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+      )}
+      {activeTab === 'bulk-import' && (
+        <div className="animate-in slide-in-from-bottom-4 duration-500 w-full">
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-2xl font-bold text-white font-outfit">Add Users</h3>
+          </div>
+
+          <div className="glass-card max-w-xl">
+            <h4 className="text-lg font-bold mb-3 text-cyan-400">Upload CSV File</h4>
+            <p className="text-sm text-muted mb-6">
+              Upload a CSV file containing student names, emails, and levels to import them in bulk.
+              The CSV should have the headers: <code>name,email,level</code>.
+            </p>
+            
+            <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'rgba(0, 240, 255, 0.05)', border: '1px dashed rgba(0, 240, 255, 0.2)', borderRadius: '8px' }}>
+              <span className="text-xs text-cyan-300 font-bold block mb-1">CSV Template Format:</span>
+              <pre className="text-xs text-white/70" style={{ margin: 0 }}>
+                name,email,level{"\n"}
+                Alice Smith,alice.smith@example.com,1{"\n"}
+                Bob Johnson,bob.johnson@example.com,2
+              </pre>
+            </div>
+
+            <BulkImportWidget onImportSuccess={fetchData} />
           </div>
         </div>
       )}

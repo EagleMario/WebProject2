@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const gradeSchema = new mongoose.Schema({
@@ -15,4 +15,4 @@ const gradeSchema = new mongoose.Schema({
     Score: Number,
     feedback: String
 });
-module.exports = mongoose.model('Grade', gradeSchema);
+export default mongoose.model('Grade', gradeSchema);

@@ -1,10 +1,8 @@
-const Redis = require('ioredis');
+import Redis from 'ioredis';
 
-const redisConnection=new Redis({
-
-
-    port:6379,
+const redisConnection = new Redis({
+    port: 6379,
     maxRetriesPerRequest: null,
 });
 
-module.exports=redisConnection;
+export default redisConnection;

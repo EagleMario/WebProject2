@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Assignment = require('./Assignment.js');
+import mongoose from 'mongoose';
+import Assignment from './Assignment.js';
 const { Schema } = mongoose;
 
 const AssignmentSubmissionSchema = new Schema({
@@ -33,4 +33,4 @@ const AssignmentSubmissionSchema = new Schema({
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model("AssignmentSubmission", AssignmentSubmissionSchema);
+export default mongoose.model("AssignmentSubmission", AssignmentSubmissionSchema);

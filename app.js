@@ -1,22 +1,22 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
+import 'dotenv/config.js';
+import express from 'express';
+import cors from 'cors';
 
 // Import Routes
-const userRoute = require('./src/Users/UserRoute.js');
-const classRoute = require('./src/Classes/classRoute.js');
-const ExamRoute = require('./src/Exams/ExamRoute.js');
-const ExamScheduleRoute = require('./src/Exams/ExamScheduleRoute.js');
-const GradeRoute = require('./src/Grades/GradeRoute.js');
-const DashboardRoute = require('./src/Dashboards/DashBoardRoute.js');
-const lecturesRoute = require('./src/Lectures/LecturesRoute.js');
-const NotificationRoute = require('./src/Notifications/NotificationRoute.js');
-const aiRoute = require('./src/Ai/AiRoute.js');
-const assignmentRoute = require('./src/Assignments/AssignmentRoute.js');
+import userRoute from './src/Users/UserRoute.js';
+import classRoute from './src/Classes/classRoute.js';
+import ExamRoute from './src/Exams/ExamRoute.js';
+import ExamScheduleRoute from './src/Exams/ExamScheduleRoute.js';
+import GradeRoute from './src/Grades/GradeRoute.js';
+import DashboardRoute from './src/Dashboards/DashBoardRoute.js';
+import lecturesRoute from './src/Lectures/LecturesRoute.js';
+import NotificationRoute from './src/Notifications/NotificationRoute.js';
+import aiRoute from './src/Ai/AiRoute.js';
+import assignmentRoute from './src/Assignments/AssignmentRoute.js';
 
 // Import Error Controller
-const globalErrorController = require('./src/Errors/errorController.js');
-const AppError = require('./src/Core/Utils/appError.js');
+import globalErrorController from './src/Errors/errorController.js';
+import AppError from './src/Core/Utils/appError.js';
 
 // Initialize Express App
 const app = express();
@@ -51,4 +51,4 @@ app.all('*', (req, res, next) => {
 // Error Controller
 app.use(globalErrorController);
 
-module.exports = app;
+export default app;

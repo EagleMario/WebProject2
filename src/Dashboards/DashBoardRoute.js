@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const authMiddleware = require('../Core/MiddleWare/UserMiddleWare.js');
-const dashboardController = require('./DashboardController.js');
+import * as authMiddleware from '../Core/MiddleWare/UserMiddleWare.js';
+import * as dashboardController from './DashboardController.js';
 
 router.get('/top-teachers', dashboardController.getTopTeachers);
 
@@ -23,4 +23,4 @@ router.get('/student-stats',
     dashboardController.GetStudentDash
 );
 
-module.exports = router;
+export default router;

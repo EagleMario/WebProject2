@@ -1,8 +1,8 @@
-const express = require('express');
-const UserMiddleWare = require('../Core/MiddleWare/UserMiddleWare.js');
-const UserController = require('./UserController.js');
+import express from 'express';
+import * as UserMiddleWare from '../Core/MiddleWare/UserMiddleWare.js';
+import * as UserController from './UserController.js';
 const router = express.Router();
-const multer = require('multer');
+import multer from 'multer';
 const upload = multer({ dest: 'uploads/' });
 
 
@@ -21,4 +21,4 @@ router.patch('/approve-user/:id', UserMiddleWare.protect, UserMiddleWare.restric
 router.delete('/:id', UserMiddleWare.protect, UserMiddleWare.restrictTo('Manager', 'admin'), UserController.deleteUser);
 
 
-module.exports = router;
+export default router;

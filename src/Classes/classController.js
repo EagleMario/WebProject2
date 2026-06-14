@@ -1,11 +1,11 @@
-const Class = require('./class.js');
-const User = require('../Users/User.js');
-const AppError = require('../Core/Utils/appError.js');
-const catchasync = require('../Core/Utils/CatchAsync.js');
-const reportQueue = require('../Core/Queues/reportQueue');
+import Class from './class.js';
+import User from '../Users/User.js';
+import AppError from '../Core/Utils/appError.js';
+import catchasync from '../Core/Utils/CatchAsync.js';
+import reportQueue from '../Core/Queues/reportQueue.js';
 
 
-exports.generateBulkReports=catchasync(async(req,res,next)=>{
+export const generateBulkReports=catchasync(async(req,res,next)=>{
 const{gradeId,exam}=req.body;
 
 const job=await reportQueue.add('generate-report-job',
@@ -21,7 +21,7 @@ res.staus(200).json({
   jobId:job.id
 });
 });
-exports.CreateClass = catchasync(async (req, res, next) => {
+export const CreateClass = catchasync(async (req, res, next) => {
   console.log('CreateClass called');
   console.log('User:', { id: req.user.id, role: req.user.role, email: req.user.email });
   console.log('Request body:', req.body);
@@ -65,7 +65,7 @@ exports.CreateClass = catchasync(async (req, res, next) => {
     throw error;
   }
 });
-exports.AddStudentsToClass = catchasync(async (req, res, next) => {
+export const AddStudentsToClass = catchasync(async (req, res, next) => {
   const classToUpdate = await Class.findById(req.params.classId);
   if (!classToUpdate) {
     return next(new AppError('Class Not found', 404));
@@ -87,7 +87,7 @@ exports.AddStudentsToClass = catchasync(async (req, res, next) => {
 
   res.status(200).json({ status: 'success', data: classToUpdate });
 });
-exports.getAllClasses = catchasync(async (req, res, next) => {
+export const getAllClasses = catchasync(async (req, res, next) => {
   let filter = {}
   if (req.user.role.toLowerCase() === 'manager') {
     filter = { manager: req.user.id }
@@ -101,7 +101,7 @@ exports.getAllClasses = catchasync(async (req, res, next) => {
     data: { classes }
   });
 });
-exports.addTeacherToClass = catchasync(async (req, res, next) => {
+export const addTeacherToClass = catchasync(async (req, res, next) => {
   const { classId, teacherId, subject } = req.body;
 
   const currentClass = await Class.findById(classId);
@@ -119,7 +119,7 @@ exports.addTeacherToClass = catchasync(async (req, res, next) => {
   res.status(200).json({ status: 'success', data: { class: currentClass } });
 });
 
-exports.addStudentToClass = catchasync(async (req, res, next) => {
+export const addStudentToClass = catchasync(async (req, res, next) => {
   const { classId, studentId } = req.body;
 
   const currentClass = await Class.findById(classId);
@@ -146,7 +146,7 @@ exports.addStudentToClass = catchasync(async (req, res, next) => {
   res.status(200).json({ status: 'success', data: { class: currentClass } });
 });
 
-exports.deleteClass = catchasync(async (req, res, next) => {
+export const deleteClass = catchasync(async (req, res, next) => {
   const { classId } = req.params;
   const cls = await Class.findById(classId);
   if (!cls) return next(new AppError('Class not found', 404));
@@ -159,7 +159,7 @@ exports.deleteClass = catchasync(async (req, res, next) => {
   res.status(200).json({ status: 'success', message: 'Class deleted successfully' });
 });
 
-exports.updateClass = catchasync(async (req, res, next) => {
+export const updateClass = catchasync(async (req, res, next) => {
   const { classId } = req.params;
   const { className, subject, level } = req.body;
 

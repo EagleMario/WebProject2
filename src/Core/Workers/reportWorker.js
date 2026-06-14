@@ -1,5 +1,5 @@
-const { Worker } = require('bullmq');
-const redisConnection = require('../../../Config/redisClient');
+import { Worker } from 'bullmq';
+import redisConnection from '../../../Config/redisClient.js';
 
 // ده اللي بيسحب الشغل من الطابور وينفذه
 const reportWorker = new Worker(
@@ -27,4 +27,4 @@ reportWorker.on('failed', (job, err) => {
   console.error(`[Worker] Job ${job.id} failed with error:`, err.message);
 });
 
-module.exports = reportWorker;
+export default reportWorker;

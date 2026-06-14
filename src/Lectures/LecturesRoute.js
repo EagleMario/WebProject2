@@ -1,11 +1,11 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const lecture = require('./LecturesController.js');
-const { protect, restrictTo } = require('../Core/MiddleWare/UserMiddleWare.js');
+import * as lecture from './LecturesController.js';
+import { protect, restrictTo } from '../Core/MiddleWare/UserMiddleWare.js';
 
 router.post('/addLectures', protect, restrictTo('teacher'), lecture.addLectures);
 router.get('/class/:classId', protect, lecture.GetClassLectures);
 router.post('/joinLectures', protect, lecture.joinLectures);
 router.post('/DeleteLectures', protect, restrictTo('teacher'), lecture.DeleteLectures);
 
-module.exports = router;
+export default router;

@@ -1,8 +1,8 @@
-const express = require('express');
-const AIController = require('./aiController.js');
-const UserMiddleWare = require('../Core/MiddleWare/UserMiddleWare.js');
+import express from 'express';
+import * as AIController from './aiController.js';
+import { protect } from '../Core/MiddleWare/UserMiddleWare.js';
 const router = express.Router();
 
-router.post('/chat', UserMiddleWare.protect, AIController.handleAIChat);
+router.post('/chat', protect, AIController.handleAIChat);
 
-module.exports = router;
+export default router;

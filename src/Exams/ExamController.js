@@ -1,12 +1,12 @@
-const Exam=require('./exam.js');
-const Class=require('../Classes/class.js');
-const Grade=require('../Grades/Grade.js');
-const AppError=require('../Core/Utils/appError.js');
-const catchasync=require('../Core/Utils/CatchAsync.js');
-const examService = require('./ExamServices.js');
-const reportQueue = require('../Core/Queues/reportQueue.js');
+import Exam from './exam.js';
+import Class from '../Classes/class.js';
+import Grade from '../Grades/Grade.js';
+import AppError from '../Core/Utils/appError.js';
+import catchasync from '../Core/Utils/CatchAsync.js';
+import * as examService from './ExamServices.js';
+import reportQueue from '../Core/Queues/reportQueue.js';
 
-exports.generateBulkReports=catchasync(async(req,res,next)=>{
+export const generateBulkReports=catchasync(async(req,res,next)=>{
 const{gradeId,exam}=req.body;
 
 const job=await reportQueue.add('generate-report-job',
@@ -23,7 +23,7 @@ res.staus(200).json({
 });
 });
 
-exports.CreateExam=catchasync(async(req,res,next)=>{
+export const CreateExam=catchasync(async(req,res,next)=>{
   const targetclass=await Class.findById(req.body.classId);
   if(!targetclass){
     return next(new AppError('class not found',404));
@@ -44,7 +44,7 @@ exports.CreateExam=catchasync(async(req,res,next)=>{
     data:{exam:newExam}
   });
 });
-exports.submitExam = async (req, res) => {
+export const submitExam = async (req, res) => {
     try {
         const { studentId, examId, calculatedScore } = req.body;
 
@@ -70,7 +70,7 @@ exports.submitExam = async (req, res) => {
         });
     }
 };
-exports.GetAllExam=catchasync(async(req,res)=>{
+export const GetAllExam=catchasync(async(req,res)=>{
     let filter={};
     if(req.user.role && req.user.role.toLowerCase()==='manager'){
       filter={Manager:req.user.id};
@@ -83,7 +83,7 @@ exports.GetAllExam=catchasync(async(req,res)=>{
     });
 });
 
-exports.deleteExam=catchasync(async(req,res,next)=>{
+export const deleteExam=catchasync(async(req,res,next)=>{
     const exam=await Exam.findById(req.params.id);
     if(!exam){
       return next(new AppError('Exam not found',404));
@@ -95,7 +95,7 @@ exports.deleteExam=catchasync(async(req,res,next)=>{
     res.status(204).json({status:'success',data:null});
 });
 
-exports.GetAvailableExams = catchasync (async(req, res) => {
+export const GetAvailableExams = catchasync (async(req, res) => {
   // Find classes where student is enrolled (students is an array)
   const studentclasses=await Class.find({students: req.user.id});
   const classIds=studentclasses.map(c=>c._id);
@@ -121,7 +121,7 @@ exports.GetAvailableExams = catchasync (async(req, res) => {
   res.status(200).json({status:'success',data:{exams:availableExam}});
 });
 
-exports.SubmitExam = catchasync(async (req, res, next) => {
+export const SubmitExam = catchasync(async (req, res, next) => {
   const {examId, answers} = req.body;
   const exam = await Exam.findById(examId);
 

@@ -1,9 +1,9 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const User = require('./User.js');
+import 'dotenv/config';
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import User from '../Users/User.js';
 
-const ConnectDb = require('../../Config/DB.js');
+import ConnectDb from '../../Config/DB.js';
 
 
 

@@ -1,7 +1,7 @@
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
-const crypto = require('crypto'); 
-exports.submitExamService = async (studentId, examId, calculatedScore) => {
+import crypto from 'crypto'; 
+export const submitExamService = async (studentId, examId, calculatedScore) => {
     return await prisma.$transaction(async (tx) => { 
     
     const newRecordId = crypto.randomUUID();
