@@ -19,6 +19,6 @@ router.get('/all', UserMiddleWare.protect, UserController.getAllUsers);
 router.get('/pending-users', UserMiddleWare.protect, UserMiddleWare.restrictTo('Manager', 'admin'), UserController.getPendingUsers);
 router.patch('/approve-user/:id', UserMiddleWare.protect, UserMiddleWare.restrictTo('Manager', 'admin'), UserController.approveUser);
 router.delete('/:id', UserMiddleWare.protect, UserMiddleWare.restrictTo('Manager', 'admin'), UserController.deleteUser);
-
+router.patch('/deactivate/:id', UserMiddleWare.protect, UserMiddleWare.restrictTo('Manager', 'admin'), UserController.DectivateUsers);
 
 export default router;
