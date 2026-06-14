@@ -3,25 +3,35 @@
   "version": "1.0.0",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@prisma/client": "^5.22.0",
     "bcrypt": "^6.0.0",
+    "bullmq": "^5.78.0",
     "cors": "^2.8.6",
+    "csv-parser": "^3.2.1",
     "date-fns": "^4.1.0",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1",
+    "express": "^4.21.0",
+    "ioredis": "^5.11.1",
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.1.1",
     "mongoose": "^9.4.1",
+    "multer": "^2.1.1",
     "openai": "^6.34.0",
     "socket.io": "^4.8.3",
-    "uuid": "^13.0.0"
+    "uuid": "^9.0.1"
   },
   "scripts": {
     "start": "node Server.js",
     "dev": "nodemon Server.js",
-    "build": "npm install --prefix frontend && npm run build --prefix frontend"
+    "build": "npm install --prefix frontend && npm run build --prefix frontend",
+    "devStart": "nodemon --exec npx tsx scripts.ts"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "@types/node": "^25.9.1",
+    "nodemon": "^3.1.14",
+    "prisma": "^5.22.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
   },
   "engines": {
     "node": ">=18.0.0"

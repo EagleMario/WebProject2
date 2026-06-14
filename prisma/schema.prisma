@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+enum Role{
+MANAGER
+TEACHER
+STUDENT
+}
+enum Level {
+  LEVEL_1
+  LEVEL_2
+  LEVEL_3
+  LEVEL_4
+}
+model user {
+  id String @id @default(uuid())
+  name String @unique
+  email String @unique
+  password  String
+  role Role @default(STUDENT)
+  TeacherClass Class[] @relation("classTeacher")
+  StudentClass Class[]@relation("classStudent")
+  createdAssignment Assignment[] @relation("teacherAssignments")
+CreatedLectures Lecture[]@relation("teacherLectures")
+CreatedExam Exam[]@relation("teacherExam")
+
+  assignmentGrades AssignmentGrade[]
+
+  examGrades ExamGrade[]
+  
+  gpa Gpa?
+}
+model Class{
+id String @id @default(uuid())
+className String @unique
+maxStudent Int @default(20)
+level Level @default(LEVEL_1)
+
+teacherId String
+teacher user @relation("classTeacher",fields:[teacherId],references: [id])
+ students user[]@relation("classStudent")
+
+lectures Lecture[]
+Exams Exam[]
+examGrades          ExamGrade[]
+assignmentGrades    AssignmentGrade[]
+
+
+}
+model Lecture{
+  id String @id @default(uuid())
+  title String
+  content String
+  CreatedAt DateTime @default(now())
+
+  classId String
+  class Class @relation(fields: [classId],references: [id])
+
+  teacherId String
+  teacher user @relation("teacherLectures",fields: [teacherId],references: [id])
+}
+model Exam{
+id String @id @default(uuid())
+subjectName String
+totalMarks Int 
+date  DateTime 
+duration  Int
+
+questions String 
+
+
+classId String
+class Class @relation(fields: [classId],references: [id])
+
+
+teacherId String
+teacher user @relation("teacherExam",fields: [teacherId],references: [id])
+
+  grades ExamGrade[]
+
+  @@index([teacherId])
+
+}
+model ExamGrade {
+  id        String   @id @default(uuid())
+  score     Float    
+  createdAt DateTime @default(now())
+
+
+  studentId String
+  student   user     @relation(fields: [studentId], references: [id])
+
+  examId    String
+  exam      Exam     @relation(fields: [examId], references: [id])
+
+  @@unique([studentId, examId])
+  classes Class[]
+
+@@index([studentId])
+@@index([examId])
+
+}
+model Assignment{
+  id String @id @default(uuid())
+  Title String
+  description String
+  dueDate DateTime @default(now())
+
+  teacherId String
+  Teacher user @relation("teacherAssignments",fields: [teacherId],references: [id])
+
+  assignmentGrades AssignmentGrade[]
+}
+model AssignmentGrade {
+  id           String     @id @default(uuid())
+  score        Float
+  createdAt    DateTime   @default(now())
+
+ 
+  studentId    String
+  student      user       @relation(fields: [studentId], references: [id])
+
+  assignmentId String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id])
+
+  @@unique([studentId, assignmentId])
+  classes Class[]
+}
+model Gpa {
+  id        String   @id @default(uuid())
+  
+  studentId String   @unique
+  student   user     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  gpaScore  Float    @default(0.0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

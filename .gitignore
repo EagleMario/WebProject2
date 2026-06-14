@@ -17,3 +17,9 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+/generated/prisma
+
+/generated/prisma
+
+/generated/prisma

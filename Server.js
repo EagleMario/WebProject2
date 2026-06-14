@@ -1,36 +1,48 @@
 require('dotenv').config();
 const express = require('express');
-const app = express();
-const server = require('http').createServer(app);
+const http = require('http');
+const { PrismaClient } = require('@prisma/client');
+const cors = require('cors');
+const path = require('path');
+
+// Initialize Express app
+const app = require('./app');
+const prisma = new PrismaClient();
+
+// Create HTTP server with Socket.IO
+const server = http.createServer(app);
 const io = require('socket.io')(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
   }
 });
-const User = require('./Routes/UserRoute.js');
-const AiRoute = require('./Routes/AiRoute.js');
-const Notification = require('./Routes/NotificationRoute.js');
-const Exam = require('./Routes/ExamRoute.js');
-const Grades = require('./Routes/GradeRoute.js');
-const DashBoard = require('./Routes/DashBoardRoute.js');
-const Class = require('./Routes/classRoute.js');
-const lectures = require('./Routes/LecturesRoute.js');
-const ExamSchedule = require('./Routes/ExamScheduleRoute.js');
-const Assignment = require('./Routes/AssignmentRoute.js');
-const PORT = process.env.PORT || 3500;
-const path = require('path');
-const cors = require('cors');
+
+// Make socket.io accessible to routes
+app.set('socketio', io);
+app.set('prisma', prisma);
+
+// Connect to Database
 const ConnectDB = require('./Config/DB.js');
-
-
 ConnectDB();
 
-app.use(cors());
-app.use(express.json());
+// Connect to PostgreSQL
+async function connectPostgres() {
+  try {
+    await prisma.$connect();
+    console.log('✅ PostgreSQL Connected...');
+  } catch (error) {
+    console.error('❌ PostgreSQL Connection Failed:', error);
+    process.exit(1);
+  }
+}
 
-app.set('socketio', io);
+connectPostgres();
 
+// Initialize Workers
+require('./src/Core/Workers/reportWorker');
+
+// Socket.IO Connection Handler
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
@@ -44,34 +56,21 @@ io.on('connection', (socket) => {
   });
 });
 
-app.use('/Notification', Notification);
-app.use('/DashBoard', DashBoard);
-app.use('/User', User);
-app.use('/Exam', Exam);
-app.use('/Grades', Grades);
-app.use('/Class', Class);
-app.use('/lectures', lectures);
-app.use('/ai', AiRoute);
-app.use('/ExamSchedule', ExamSchedule);
-app.use('/Assignments', Assignment);
-
-const globalErrorController = require('./Controller/errorController.js');
-
+// Serve Frontend
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
-app.use('/api', (req, res, next) => {
-  res.status(404).json({ message: "API route not found" });
-});
-
-app.use((req, res, next) => {
-  if (req.originalUrl.startsWith('/Class') || req.originalUrl.startsWith('/User') || req.originalUrl.startsWith('/DashBoard')) {
-    return next();
+// Fallback to frontend for non-API routes
+app.get('*', (req, res) => {
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(path.join(__dirname, 'frontend/dist/index.html'));
   }
-  res.sendFile(path.join(__dirname, 'frontend/dist/index.html'));
 });
 
-app.use(globalErrorController);
+// Server Port
+const PORT = process.env.PORT || 5000;
 
+// Start Server
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}...`);
+
 });
