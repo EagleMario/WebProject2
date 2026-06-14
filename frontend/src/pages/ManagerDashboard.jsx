@@ -393,6 +393,10 @@ const ManagerDashboard = () => {
   const [editForm, setEditForm] = useState({ className: '', subject: '', level: 1 });
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [userSearchQuery, setUserSearchQuery] = useState('');
+
+  // Emergency Alert state
+  const [emergencyMsg, setEmergencyMsg] = useState('');
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
   const classesByLevel = useMemo(() => {
     return LEVELS.reduce((acc, level) => {
       acc[level] = stats.classes.filter((c) => c.level === level);
@@ -437,7 +441,29 @@ const ManagerDashboard = () => {
       alert(err.response?.data?.message || "Failed to approve user");
     }
   };
-
+  const handleEmergencyBroadcast = async (e) => {
+    e.preventDefault();
+    if (!emergencyMsg.trim()) {
+      alert("Please type a message to broadcast.");
+      return;
+    }
+    if (!window.confirm("ARE YOU SURE you want to broadcast this emergency alert to all logged-in users?")) {
+      return;
+    }
+    setIsBroadcasting(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('/Notification/emergency', { message: emergencyMsg }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Emergency alert broadcasted successfully!");
+      setEmergencyMsg('');
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to send emergency alert.");
+    } finally {
+      setIsBroadcasting(false);
+    }
+  };
   const handleAssign = async (e) => {
     e.preventDefault();
     if (!targetClassId || !selectedUser) return;
@@ -762,6 +788,59 @@ const ManagerDashboard = () => {
                 })}
               </div>
             </div>
+            {/* Emergency Broadcast Card */}
+            <div className="glass-card mt-10" style={{ gridColumn: 'span 4', border: '1px solid rgba(239, 68, 68, 0.25)', boxShadow: '0 8px 32px rgba(239, 68, 68, 0.05)' }}>
+              <h3 className="text-xl font-bold flex items-center gap-3 text-red-500 mb-4" style={{ margin: '0 0 1rem 0' }}>
+                <span style={{ fontSize: '1.5rem' }}>🚨</span>
+                Broadcast Emergency Alert
+              </h3>
+              <p className="text-sm text-muted mb-6" style={{ margin: '0 0 1.25rem 0', color: 'var(--text-muted)' }}>
+                Sends a real-time, screen-blocking alert message to all logged-in students, teachers, and staff members instantly.
+              </p>
+              <form onSubmit={handleEmergencyBroadcast} style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: '280px' }}>
+                  <input
+                    type="text"
+                    required
+                    value={emergencyMsg}
+                    onChange={e => setEmergencyMsg(e.target.value)}
+                    placeholder="Type the emergency warning message here (e.g. Weather Alert: School is closed tomorrow!)..."
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(239, 68, 68, 0.2)',
+                      background: 'rgba(0,0,0,0.3)',
+                      color: 'white',
+                      fontSize: '0.95rem',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isBroadcasting}
+                  className="btn btn-primary"
+                  style={{
+                    background: '#ff3b30',
+                    border: 'none',
+                    padding: '12px 24px',
+                    borderRadius: '8px',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 15px rgba(255, 59, 48, 0.2)',
+                    transition: 'all 0.25s ease',
+                    height: '45px',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  {isBroadcasting ? "Broadcasting..." : "Broadcast Alert"}
+                </button>
+              </form>
+            </div>
+
           </div>
         </>
       )}

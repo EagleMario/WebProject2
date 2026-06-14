@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import { useNotifications } from './context/NotificationContext';
 import Navbar from './components/Navbar';
 import AiChatWidget from './components/AiChatWidget';
 import Login from './pages/Login';
@@ -43,6 +44,7 @@ const skeletonCircle = (size) => ({
 function App() {
 
   const { user, loading } = useAuth();
+  const { emergencyAlert, setEmergencyAlert } = useNotifications();
 
   if (loading) {
     return (
@@ -163,6 +165,96 @@ function App() {
       </div>
 
       {user && <AiChatWidget />}
+
+      {emergencyAlert && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 99999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: "'Outfit', sans-serif"
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #200b0b, #3d0c0c)',
+            border: '2px solid #ff3b30',
+            boxShadow: '0 0 40px rgba(255, 59, 48, 0.4), inset 0 0 20px rgba(255, 59, 48, 0.2)',
+            borderRadius: '24px',
+            padding: '2.5rem',
+            width: '90%',
+            maxWidth: '550px',
+            textAlign: 'center',
+            color: 'white',
+            boxSizing: 'border-box'
+          }}>
+            <div style={{
+              fontSize: '4rem',
+              display: 'inline-block',
+              marginBottom: '1rem'
+            }}>
+              🚨
+            </div>
+            <h2 style={{
+              fontSize: '2rem',
+              fontWeight: '900',
+              color: '#ff3b30',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              margin: '0 0 1rem 0',
+              textShadow: '0 0 10px rgba(255, 59, 48, 0.5)'
+            }}>
+              Emergency Alert
+            </h2>
+            <div style={{
+              fontSize: '1.15rem',
+              lineHeight: '1.6',
+              background: 'rgba(0,0,0,0.3)',
+              border: '1px solid rgba(255,59,48,0.2)',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              marginBottom: '1.8rem',
+              textAlign: 'left',
+              wordBreak: 'break-word',
+              color: '#ffe5e5'
+            }}>
+              {emergencyAlert.message}
+            </div>
+            
+            <div style={{
+              fontSize: '0.8rem',
+              color: 'rgba(255,255,255,0.4)',
+              marginBottom: '2rem'
+            }}>
+              Sent at: {new Date(emergencyAlert.Timestamp).toLocaleString()}
+            </div>
+
+            <button
+              onClick={() => setEmergencyAlert(null)}
+              style={{
+                background: '#ff3b30',
+                color: 'white',
+                border: 'none',
+                padding: '12px 32px',
+                borderRadius: '12px',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                boxShadow: '0 4px 15px rgba(255, 59, 48, 0.3)',
+                transition: 'all 0.2s ease',
+                outline: 'none'
+              }}
+            >
+              Acknowledge & Close
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

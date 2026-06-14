@@ -4,29 +4,23 @@ import catchasync from '../Core/Utils/CatchAsync.js';
 import { Timestamp } from 'mongodb';
 
 
-export const broadCastEmergency = catchasync(async (req, res) => {
-    try {
-        const { message } = req.body;
+export const broadCastEmergency = catchasync(async (req, res, next) => {
+    const { message } = req.body;
 
-        if (!message) {
-            return new AppError("Message is required", 400)
-        }
-        const io = req.app.get('socketio');
+    if (!message) {
+        return next(new AppError("Message is required", 400));
+    }
+    const io = req.app.get('socketio');
 
-        if (!io) {
-            return new AppError("Socket server not running", 500)
-        }
-        io.emit('emergency_alert', {
-            message,
-            Timestamp: new Date()
-        });
-        return res.status(200).json({ success: true, message: "Emergency alert sent" })
+    if (!io) {
+        return next(new AppError("Socket server not running", 500));
     }
-    catch (error) {
-        console.log(error);
-        return new AppError("Internal server error", 500)
-    }
-})
+    io.emit('emergency_alert', {
+        message,
+        Timestamp: new Date()
+    });
+    return res.status(200).json({ success: true, message: "Emergency alert sent" });
+});
 export const PushNotification = catchasync(async (req, res) => {
     const { UserId, Title, message } = req.body;
     const notifications = new Notification({

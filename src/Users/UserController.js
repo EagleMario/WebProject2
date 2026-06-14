@@ -22,16 +22,16 @@ export const bulkImportStudents = catchasync(async (req, res, next) => {
     const filePath = req.file.path;
 
     await new Promise((resolve, reject) => {
-      fs.createReadStream(filePath)
-        .pipe(csv())
-        .on('data', (data) => results.push(data))
-        .on('end', resolve)
-        .on('error', reject);
+        fs.createReadStream(filePath)
+            .pipe(csv())
+            .on('data', (data) => results.push(data))
+            .on('end', resolve)
+            .on('error', reject);
     });
 
     if (results.length === 0) {
-      fs.unlinkSync(filePath);
-      return next(new AppError('The CSV file is empty!', 400));
+        fs.unlinkSync(filePath);
+        return next(new AppError('The CSV file is empty!', 400));
     }
 
     const defaultPassword = 'MarioSchool';
@@ -40,23 +40,23 @@ export const bulkImportStudents = catchasync(async (req, res, next) => {
     console.log("Parsed CSV rows:", results);
 
     const studentsData = results.map(student => {
-      const getVal = (obj, keyName) => {
-        const key = Object.keys(obj).find(k => k.toLowerCase().trim().replace(/^\ufeff/, '') === keyName.toLowerCase());
-        return key ? obj[key]?.trim() : undefined;
-      };
+        const getVal = (obj, keyName) => {
+            const key = Object.keys(obj).find(k => k.toLowerCase().trim().replace(/^\ufeff/, '') === keyName.toLowerCase());
+            return key ? obj[key]?.trim() : undefined;
+        };
 
-      const name = getVal(student, 'name');
-      const email = getVal(student, 'email');
-      const levelVal = getVal(student, 'level');
+        const name = getVal(student, 'name');
+        const email = getVal(student, 'email');
+        const levelVal = getVal(student, 'level');
 
-      return {
-        name,
-        email,
-        password: hashedPassword,
-        role: 'student',
-        level: levelVal ? Number(levelVal) : undefined,
-        isApproved: true
-      };
+        return {
+            name,
+            email,
+            password: hashedPassword,
+            role: 'student',
+            level: levelVal ? Number(levelVal) : undefined,
+            isApproved: true
+        };
     });
 
     console.log("Mapped studentsData for database:", studentsData);
@@ -64,42 +64,42 @@ export const bulkImportStudents = catchasync(async (req, res, next) => {
     // Filter out users whose name, email, or level is missing/invalid
     const validStudentsData = studentsData.filter(s => s.name && s.email && [1, 2, 3, 4].includes(s.level));
     if (validStudentsData.length === 0) {
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      return next(new AppError('No valid student records found. Check headers (name,email,level) and levels (1-4).', 400));
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        return next(new AppError('No valid student records found. Check headers (name,email,level) and levels (1-4).', 400));
     }
 
     try {
-      // Find existing emails in the database to prevent duplicate keys
-      const emails = validStudentsData.map(s => s.email.toLowerCase());
-      const existingUsers = await User.find({ email: { $in: emails } });
-      const existingEmails = new Set(existingUsers.map(u => u.email.toLowerCase()));
+        // Find existing emails in the database to prevent duplicate keys
+        const emails = validStudentsData.map(s => s.email.toLowerCase());
+        const existingUsers = await User.find({ email: { $in: emails } });
+        const existingEmails = new Set(existingUsers.map(u => u.email.toLowerCase()));
 
-      const newStudentsData = validStudentsData.filter(s => !existingEmails.has(s.email.toLowerCase()));
+        const newStudentsData = validStudentsData.filter(s => !existingEmails.has(s.email.toLowerCase()));
 
-      if (newStudentsData.length === 0) {
+        if (newStudentsData.length === 0) {
+            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            return res.status(200).json({
+                status: 'success',
+                message: 'All students in the CSV file already exist in the database.',
+                count: 0,
+                data: { students: [] }
+            });
+        }
+
+        const insertedStudents = await User.insertMany(newStudentsData);
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        return res.status(200).json({
-          status: 'success',
-          message: 'All students in the CSV file already exist in the database.',
-          count: 0,
-          data: { students: [] }
+
+        res.status(201).json({
+            status: 'success',
+            message: 'Bulk import completed successfully',
+            count: insertedStudents.length,
+            data: {
+                students: insertedStudents
+            }
         });
-      }
-
-      const insertedStudents = await User.insertMany(newStudentsData);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-
-      res.status(201).json({
-          status: 'success',
-          message: 'Bulk import completed successfully',
-          count: insertedStudents.length,
-          data: {
-              students: insertedStudents
-          }
-      });
     } catch (err) {
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      return next(err);
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        return next(err);
     }
 });
 export const SignUp = catchasync(async (req, res, next) => {
@@ -176,4 +176,26 @@ export const deleteUser = catchasync(async (req, res, next) => {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) return next(new AppError('User not found', 404));
     res.status(204).json({ status: 'success', data: null });
+});
+export const DectivateUsers = catchasync(async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        const UpdateUser = await User.findByIdAndUpdate(userId, { $set: { isApproved: false } }, { new: true });
+        if (!UpdateUser) {
+            return next(new AppError('User not found', 404));
+        }
+        res.status(200).json({ status: 'success', data: { user: UpdateUser } });
+
+        const io = req.app.get('socketio');
+        io.to(userId).emit('user_deactivated', {
+            message: 'Your account has been deactivated by the manager.'
+        })
+        console.log('Force fully Logged out', userId);
+        res.status(200).json({ status: 'success', message: 'User deactivated successfully' });
+    }
+    catch (error) {
+        console.log('Error Deactivating User', error);
+        res.status(500).json({ status: 'error', message: 'Failed to deactivate user' });
+    }
 });

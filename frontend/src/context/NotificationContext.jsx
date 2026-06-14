@@ -9,6 +9,7 @@ export const NotificationProvider = ({ children }) => {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [emergencyAlert, setEmergencyAlert] = useState(null);
   const socketRef = useRef(null);
 
   useEffect(() => {
@@ -31,6 +32,12 @@ export const NotificationProvider = ({ children }) => {
         
         // Optional: Play a sound or trigger a small animation
         console.log('New real-time notification:', notification);
+      });
+
+      // Listen for emergency alerts
+      socket.on('emergency_alert', (data) => {
+        console.log('🚨 EMERGENCY ALERT RECEIVED:', data);
+        setEmergencyAlert(data);
       });
 
       // Fetch initial notifications
@@ -60,7 +67,7 @@ export const NotificationProvider = ({ children }) => {
   };
 
   return (
-    <NotificationContext.Provider value={{ notifications, unreadCount, markAsRead }}>
+    <NotificationContext.Provider value={{ notifications, unreadCount, markAsRead, emergencyAlert, setEmergencyAlert }}>
       {children}
     </NotificationContext.Provider>
   );
