@@ -38,8 +38,9 @@ async function connectPostgres() {
     await prisma.$connect();
     console.log('✅ PostgreSQL Connected...');
   } catch (error) {
-    console.error('❌ PostgreSQL Connection Failed:', error);
-    process.exit(1);
+    console.error('❌ PostgreSQL Connection Failed:', error.message);
+    console.error('   Make sure DATABASE_URL is set in your environment variables.');
+    // Do not exit — allow server to start so other routes (MongoDB) still work
   }
 }
 

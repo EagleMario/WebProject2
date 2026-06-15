@@ -10,3 +10,7 @@ services:
       - key: MONGO_URI
         sync: false
         # Note: You MUST configure MONGO_URI in the Render Dashboard -> Environment Variables
+      - key: DATABASE_URL
+        sync: false
+        # Note: You MUST configure DATABASE_URL in the Render Dashboard -> Environment Variables
+        # Create a free PostgreSQL database on Render and paste its Internal Database URL here
