@@ -63,14 +63,15 @@ io.on('connection', (socket) => {
   });
 });
 
-// Serve Frontend
+// Serve Frontend static files
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
-// Fallback to frontend for non-API routes
-app.get('*', (req, res) => {
-  if (!req.path.startsWith('/api')) {
-    res.sendFile(path.join(__dirname, 'frontend/dist/index.html'));
+// SPA fallback — serve index.html for all non-API routes
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next(); // let the error controller handle unknown API routes
   }
+  res.sendFile(path.join(__dirname, 'frontend/dist/index.html'));
 });
 
 // Server Port

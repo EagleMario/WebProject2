@@ -14,3 +14,7 @@ services:
         sync: false
         # Note: You MUST configure DATABASE_URL in the Render Dashboard -> Environment Variables
         # Create a free PostgreSQL database on Render and paste its Internal Database URL here
+      - key: REDIS_URL
+        sync: false
+        # Optional: Add a Redis instance (e.g. Render Redis or Upstash) for BullMQ queue support
+        # Without this, report card queues will be disabled but the app will still run

@@ -47,10 +47,6 @@ app.get('/health', (req, res) => {
   res.json({ status: 'Server is running' });
 });
 
-// 404 Handler
-app.all('*', (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
-});
 
 // Error Controller
 app.use(globalErrorController);
