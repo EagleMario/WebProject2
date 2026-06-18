@@ -42,6 +42,20 @@ app.use('/api/assignments', assignmentRoute);
 app.use('/api/fees', feesRoute);
 app.use('/api/salaries', salaryRoute);
 
+// Frontend-alias routes (mirrors the Vite dev proxy config so the built
+// frontend served at port 3000 works without the Vite dev server running)
+app.use('/User', userRoute);
+app.use('/Class', classRoute);
+app.use('/Exam', ExamRoute);
+app.use('/Grades', GradeRoute);
+app.use('/DashBoard', DashboardRoute);
+app.use('/lectures', lecturesRoute);
+app.use('/Notification', NotificationRoute);
+app.use('/ai', aiRoute);
+app.use('/Assignments', assignmentRoute);
+app.use('/Fees', feesRoute);
+app.use('/Salaries', salaryRoute);
+
 // Health Check Route
 app.get('/health', (req, res) => {
   res.json({ status: 'Server is running' });
